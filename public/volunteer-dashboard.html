@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volunteer Dashboard | VolunteerSkill</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg vs-navbar py-3">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="volunteer-dashboard.html"><i class="fas fa-hands-helping me-2"></i>VolunteerSkill</a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <div class="dropdown">
+        <button class="btn btn-light position-relative" data-bs-toggle="dropdown">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" class="notif-dot position-absolute top-0 end-0" style="display:none"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-0" style="width: 320px; max-height: 400px; overflow:auto;">
+          <div id="notifList"><div class="dropdown-item-text text-muted">Loading...</div></div>
+        </div>
+      </div>
+      <span class="fw-semibold" id="userNameTop"></span>
+      <button class="btn btn-sm btn-outline-danger" onclick="VS.logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-4">
+    <!-- Sidebar / Profile summary -->
+    <div class="col-lg-3">
+      <div class="sidebar-vs mb-4">
+        <div class="text-center mb-3">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1e8e5a,#1565c0);display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <i class="fas fa-user fa-2x text-white"></i>
+          </div>
+          <h5 class="mt-3 mb-0" id="profileName">-</h5>
+          <p class="text-muted small mb-0" id="profileEmail">-</p>
+          <div id="profileStars" class="mt-1"></div>
+        </div>
+        <hr>
+        <p class="small mb-1"><i class="fas fa-map-marker-alt text-success me-1"></i><span id="profileLocation">-</span></p>
+        <p class="small mb-1"><i class="fas fa-phone text-success me-1"></i><span id="profilePhone">-</span></p>
+        <p class="small mb-2"><i class="fas fa-briefcase text-success me-1"></i><span id="profileExperience">-</span></p>
+        <div class="mb-2" id="profileSkills"></div>
+        <hr>
+        <div class="d-grid gap-2">
+          <a class="nav-link active" href="#opportunities-section" data-tab="opportunities-section"><i class="fas fa-bullseye me-2"></i>My Opportunities</a>
+          <a class="nav-link" href="#micro-section" data-tab="micro-section"><i class="fas fa-bolt me-2"></i>Micro-Volunteering</a>
+          <a class="nav-link" href="#nearby-section" data-tab="nearby-section"><i class="fas fa-map-marked-alt me-2"></i>Nearby Map</a>
+          <a class="nav-link" href="#needmap-section" data-tab="needmap-section"><i class="fas fa-fire me-2"></i>Community Need Map</a>
+          <a class="nav-link" href="#impactscore-section" data-tab="impactscore-section"><i class="fas fa-gauge-high me-2"></i>Impact Score</a>
+          <a class="nav-link" href="#passport-section" data-tab="passport-section"><i class="fas fa-id-badge me-2"></i>Skill Passport</a>
+          <a class="nav-link" href="#impact-section" data-tab="impact-section"><i class="fas fa-chart-line me-2"></i>Impact Profile</a>
+          <a class="nav-link" href="#badges-section" data-tab="badges-section"><i class="fas fa-medal me-2"></i>Badges & Leaderboard</a>
+          <a class="nav-link" href="#certificates-section" data-tab="certificates-section"><i class="fas fa-certificate me-2"></i>My Certificates</a>
+          <a class="nav-link" href="#assistant-section" data-tab="assistant-section"><i class="fas fa-robot me-2"></i>AI Assistant</a>
+          <a class="nav-link" href="#settings-section" data-tab="settings-section"><i class="fas fa-shield-alt me-2"></i>Privacy & Notifications</a>
+        </div>
+      </div>
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="stat-card"><div class="stat-value" id="statAccepted">0</div><div class="stat-label">Accepted</div></div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card"><div class="stat-value" id="statCompleted">0</div><div class="stat-label">Completed</div></div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card"><div class="stat-value" id="statHours">0</div><div class="stat-label">Hours</div></div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card"><div class="stat-value" id="statBadges">0</div><div class="stat-label">Badges</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="col-lg-9">
+      <div class="vs-tab-section" id="opportunities-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="section-title mb-0"><i class="fas fa-bullseye me-2"></i>Matched Opportunities</h4>
+          <button class="btn btn-sm btn-vs-outline" onclick="loadOpportunities()"><i class="fas fa-sync me-1"></i>Refresh</button>
+        </div>
+        <p class="text-muted small">These opportunities were automatically matched to you by our AI engine — ranked by location, then availability, then skill fit. No searching required!</p>
+        <div id="oppList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="nearby-section">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <h4 class="section-title mb-0"><i class="fas fa-map-marked-alt me-2"></i>Nearby Opportunities</h4>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm" id="radiusFilter" style="width:auto" onchange="loadNearby()">
+              <option value="5">5 km</option><option value="10">10 km</option>
+              <option value="25" selected>25 km</option><option value="50">50 km</option><option value="100">100 km</option>
+            </select>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-vs-outline active" id="viewListBtn" onclick="setNearbyView('list')"><i class="fas fa-list"></i></button>
+              <button class="btn btn-vs-outline" id="viewMapBtn" onclick="setNearbyView('map')"><i class="fas fa-map"></i></button>
+            </div>
+          </div>
+        </div>
+        <div id="nearbyMapWrap" class="d-none mb-3" style="height:360px;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,0.08);"><div id="nearbyMap" style="height:100%;width:100%;"></div></div>
+        <div id="nearbyMapFallback" class="alert alert-light border small d-none">Map view requires a Google Maps API key to be configured on the server (GOOGLE_MAPS_API_KEY). Showing list view instead.</div>
+        <div id="nearbyList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="micro-section">
+        <h4 class="section-title mb-3"><i class="fas fa-bolt me-2"></i>Micro-Volunteering</h4>
+        <p class="text-muted small">Short tasks (10–60 minutes) you can complete anytime. Online tasks are matched by skill only — distance never blocks them. Offline tasks still use location-first matching.</p>
+        <div id="microTaskWrap"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="needmap-section">
+        <h4 class="section-title mb-3"><i class="fas fa-fire me-2"></i>Community Need Map</h4>
+        <p class="text-muted small">See where volunteer support is most needed right now. Only aggregated, approximate data is shown — never individual volunteer locations.</p>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+          <select class="form-select form-select-sm" style="width:auto" id="vNeedCategoryFilter" onchange="loadNeedMapVolunteer()">
+            <option value="all">All Categories</option><option>Healthcare</option><option>Education</option><option>Environment</option><option>Community Service</option><option>Digital</option>
+          </select>
+        </div>
+        <div id="vNeedMapWrap" style="height:360px;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,0.08);" class="mb-3 d-none"><div id="vNeedMap" style="height:100%;width:100%;"></div></div>
+        <div id="vNeedMapFallback" class="alert alert-light border small d-none"></div>
+        <div id="vNeedMapList"></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="impactscore-section">
+        <h4 class="section-title mb-3"><i class="fas fa-gauge-high me-2"></i>Impact Score</h4>
+        <p class="text-muted small">A holistic view of your contribution — not just a ranking. Based on hours, completed work, verified skills, and NGO feedback.</p>
+        <div class="row g-4 mb-4">
+          <div class="col-md-4 text-center">
+            <div class="impact-score-ring" id="impactRing" style="--pct:0"><div class="inner"><div class="fs-3 fw-bold" id="impactScoreValue">0</div><div class="small text-muted">Impact Score</div></div></div>
+          </div>
+          <div class="col-md-8">
+            <div class="row g-2">
+              <div class="col-6"><div class="stat-card"><div class="stat-value" id="isHours">0</div><div class="stat-label">Hours</div></div></div>
+              <div class="col-6"><div class="stat-card"><div class="stat-value" id="isEvents">0</div><div class="stat-label">Events</div></div></div>
+              <div class="col-6"><div class="stat-card"><div class="stat-value" id="isTasks">0</div><div class="stat-label">Micro-Tasks</div></div></div>
+              <div class="col-6"><div class="stat-card"><div class="stat-value" id="isNgos">0</div><div class="stat-label">NGOs Supported</div></div></div>
+            </div>
+          </div>
+        </div>
+        <h6 class="fw-bold mb-3">Impact by Category</h6>
+        <div id="categoryBars" class="mb-4"></div>
+        <h6 class="fw-bold mb-3">Impact Timeline</h6>
+        <div class="timeline-vs" id="impactTimeline"></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="passport-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="section-title mb-0"><i class="fas fa-id-badge me-2"></i>Skill Passport</h4>
+          <button class="btn btn-sm btn-vs-outline" onclick="sharePassport()"><i class="fas fa-share-alt me-1"></i>Share / Download</button>
+        </div>
+        <p class="text-muted small">Only skills backed by real evidence — NGO-confirmed events, approved micro-tasks, or manual NGO verification — appear here as Verified.</p>
+        <div id="passportWrap" class="row g-3"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="impact-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="section-title mb-0"><i class="fas fa-chart-line me-2"></i>My Impact Profile</h4>
+          <button class="btn btn-sm btn-vs-outline" onclick="shareImpact()"><i class="fas fa-share-alt me-1"></i>Share / Download Link</button>
+        </div>
+        <div id="impactWrap"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="badges-section">
+        <h4 class="section-title mb-3"><i class="fas fa-medal me-2"></i>Badges</h4>
+        <div id="badgeGrid" class="row g-3 mb-4"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title mb-0"><i class="fas fa-trophy me-2"></i>Leaderboard (Opt-in)</h5>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="leaderboardToggle" onchange="toggleLeaderboard()">
+            <label class="form-check-label small" for="leaderboardToggle">Show me on the leaderboard</label>
+          </div>
+        </div>
+        <p class="small text-muted">Leaderboard participation is optional — badges and appreciation messages recognize every volunteer, not just top hours.</p>
+        <div id="leaderboardList" class="mb-4"></div>
+
+        <h5 class="section-title mb-2"><i class="fas fa-heart me-2"></i>Appreciation Wall</h5>
+        <div id="appreciationWall"></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="certificates-section">
+        <h4 class="section-title mb-3"><i class="fas fa-certificate me-2"></i>My Certificates</h4>
+        <div id="certList" class="row g-3"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="assistant-section">
+        <h4 class="section-title mb-3"><i class="fas fa-robot me-2"></i>AI Volunteer Assistant</h4>
+        <p class="text-muted small">Ask about your applications, upcoming events, requirements, certificates, or impact. This assistant only ever sees your own data.</p>
+        <div class="card card-vs p-3">
+          <div id="chatLog" style="height:320px;overflow-y:auto;" class="mb-3"></div>
+          <form id="chatForm" class="d-flex gap-2">
+            <input type="text" class="form-control" id="chatInput" placeholder="e.g. What are my upcoming events?" required>
+            <button class="btn btn-vs-primary" type="submit"><i class="fas fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
+
+      <div class="vs-tab-section d-none" id="settings-section">
+        <h4 class="section-title mb-3"><i class="fas fa-shield-alt me-2"></i>Privacy Settings</h4>
+        <div class="card card-vs p-3 mb-4">
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="privacyExactLoc" onchange="savePrivacy()">
+            <label class="form-check-label" for="privacyExactLoc">Share my exact location with NGOs I'm matched to (otherwise only an approximate area is shown)</label>
+          </div>
+          <div class="mb-1">
+            <label class="form-label">Profile Visibility</label>
+            <select class="form-select" id="privacyVisibility" style="max-width:260px" onchange="savePrivacy()">
+              <option value="public">Public (visible on Impact Profile shares)</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+        </div>
+        <h4 class="section-title mb-3"><i class="fas fa-bell me-2"></i>Notification Preferences</h4>
+        <div class="card card-vs p-3" id="notifPrefsWrap"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+function showTab(id) {
+  document.querySelectorAll('.vs-tab-section').forEach(s => s.classList.add('d-none'));
+  document.getElementById(id).classList.remove('d-none');
+  document.querySelectorAll('.sidebar-vs .nav-link').forEach(a => a.classList.remove('active'));
+  const link = document.querySelector(`.sidebar-vs .nav-link[data-tab="${id}"]`);
+  if (link) link.classList.add('active');
+  if (id === 'nearby-section') loadNearby();
+  if (id === 'micro-section') loadMicroTasksVolunteer();
+  if (id === 'needmap-section') loadNeedMapVolunteer();
+  if (id === 'impactscore-section') loadImpactScore();
+  if (id === 'passport-section') loadSkillPassport();
+  if (id === 'impact-section') loadImpact();
+  if (id === 'badges-section') { loadBadges(); loadLeaderboard(); loadAppreciationWall(); }
+  if (id === 'settings-section') { loadPrivacy(); loadNotifPrefs(); }
+}
+document.querySelectorAll('.sidebar-vs .nav-link').forEach(a => {
+  a.addEventListener('click', (e) => { e.preventDefault(); showTab(a.dataset.tab); });
+});
+if (!VS.requireAuth(['volunteer'])) { /* redirected */ }
+
+async function loadProfile() {
+  const { user } = await VS.get('/profile');
+  document.getElementById('userNameTop').innerText = user.name;
+  document.getElementById('profileName').innerText = user.name;
+  document.getElementById('profileEmail').innerText = user.email;
+  document.getElementById('profileLocation').innerText = user.location?.address || `${user.location.lat.toFixed(2)}, ${user.location.lng.toFixed(2)}`;
+  document.getElementById('profilePhone').innerText = user.phone;
+  document.getElementById('profileExperience').innerText = user.experience || 'No experience listed';
+  document.getElementById('profileStars').innerHTML = VS.starRating(user.rating) + ` <span class="small text-muted">(${user.ratingCount || 0})</span>`;
+  document.getElementById('profileSkills').innerHTML = (user.skills || []).map(s => `<span class="skill-chip">${s}</span>`).join('') || '<span class="text-muted small">No skills listed</span>';
+  document.getElementById('statCompleted').innerText = (user.completedEvents || []).length;
+  document.getElementById('statHours').innerText = user.hoursCompleted || 0;
+  document.getElementById('statBadges').innerText = (user.badges || []).length;
+}
+
+async function loadOpportunities() {
+  const wrap = document.getElementById('oppList');
+  wrap.innerHTML = '<div class="spinner-wrap"><div class="spinner-border text-success"></div></div>';
+  const { opportunities } = await VS.get('/volunteer/opportunities');
+
+  const accepted = opportunities.filter(o => o.status === 'accepted').length;
+  document.getElementById('statAccepted').innerText = accepted;
+
+  if (!opportunities.length) {
+    wrap.innerHTML = `<div class="alert alert-light border text-center py-5">
+      <i class="fas fa-search fa-2x text-muted mb-3"></i><br>
+      No matches yet. As NGOs post events near you, matched opportunities will appear here automatically.
+    </div>`;
+    return;
+  }
+
+  // Sort: pending first
+  opportunities.sort((a, b) => (a.status === 'pending' ? -1 : 1) - (b.status === 'pending' ? -1 : 1));
+
+  wrap.innerHTML = opportunities.map(o => `
+    <div class="card opportunity-card mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${o.title} <span class="badge badge-${o.status} ms-1">${o.status}</span></h6>
+          <p class="small text-muted mb-1"><i class="fas fa-building me-1"></i>${o.ngoName} &nbsp;|&nbsp; <i class="fas fa-tag me-1"></i>${o.category}</p>
+          <p class="small mb-2">${o.description || ''}</p>
+          <div>
+            <span class="match-score-pill pill-location"><i class="fas fa-map-marker-alt me-1"></i>${o.distanceKm} km away</span>
+            <span class="match-score-pill pill-availability"><i class="fas fa-calendar me-1"></i>Availability match: ${o.availabilityScore}</span>
+            <span class="match-score-pill pill-skill"><i class="fas fa-toolbox me-1"></i>Skill match: ${o.skillScore}</span>
+          </div>
+          <p class="small text-muted mt-2 mb-0"><i class="fas fa-calendar-day me-1"></i>${VS.fmtDate(o.date)} ${o.timeSlot?.day ? '· ' + o.timeSlot.day + ' ' + (o.timeSlot.timeOfDay||'') : ''}</p>
+        </div>
+        <div class="text-end mt-3 mt-md-0">
+          ${o.status === 'pending' ? `
+            <button class="btn btn-vs-primary btn-sm mb-1 w-100" onclick="respond('${o.eventId}','accept')"><i class="fas fa-check me-1"></i>Accept</button>
+            <button class="btn btn-outline-danger btn-sm w-100" onclick="respond('${o.eventId}','reject')"><i class="fas fa-times me-1"></i>Reject</button>
+          ` : o.status === 'accepted' ? `
+            <span class="text-success small d-block mb-1"><i class="fas fa-check-circle me-1"></i>You're in!</span>
+            <button class="btn btn-sm btn-vs-outline w-100 mb-1" onclick="showCheckin('${o.eventId}')"><i class="fas fa-qrcode me-1"></i>Check-In QR</button>
+            ${o.eventStatus === 'in-progress' ? `<button class="btn btn-sm btn-outline-danger w-100 mb-1" onclick="triggerSOS('${o.eventId}')"><i class="fas fa-triangle-exclamation me-1"></i>SOS</button>` : ''}
+            <button class="btn btn-sm btn-outline-secondary w-100" onclick="cancelAcceptance('${o.eventId}')">Cancel</button>
+          ` : `<span class="text-muted small">Not selected</span>`}
+          <button class="btn btn-sm btn-link text-muted p-0 mt-2" onclick="reportItem('event','${o.eventId}')"><i class="fas fa-flag me-1"></i>Report</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function respond(eventId, action) {
+  try {
+    await VS.post(`/volunteer/opportunities/${eventId}/${action}`);
+    VS.toast(action === 'accept' ? 'Opportunity accepted!' : 'Opportunity rejected. A replacement will be matched for the NGO.', action === 'accept' ? 'success' : 'info');
+    loadOpportunities();
+  } catch (err) {
+    VS.toast(err.message, 'error');
+  }
+}
+
+async function cancelAcceptance(eventId) {
+  if (!confirm('Cancel your accepted assignment for this event? The NGO will be notified and a replacement will be matched.')) return;
+  try {
+    await VS.post(`/volunteer/opportunities/${eventId}/cancel`);
+    VS.toast('Assignment cancelled', 'info');
+    loadOpportunities();
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+async function reportItem(type, targetId) {
+  const reason = prompt('Please describe the issue you want to report to platform admins:');
+  if (!reason || !reason.trim()) return;
+  try {
+    await VS.post('/reports', { type, targetId, reason });
+    VS.toast('Report submitted to admins', 'success');
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+async function triggerSOS(eventId) {
+  if (!confirm('This will immediately alert the organizing NGO and platform admins. Continue?')) return;
+  try {
+    const data = await VS.post(`/events/${eventId}/sos`);
+    VS.toast(data.message, 'success');
+    if (data.emergencyContact && data.emergencyContact.phone) {
+      alert(`Emergency contact: ${data.emergencyContact.name} — ${data.emergencyContact.phone}`);
+    }
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+let qrModal;
+async function showCheckin(eventId) {
+  const me = VS.getUser();
+  try {
+    const data = await VS.post(`/events/${eventId}/assignments/${me.id}/qrcode`, { purpose: 'checkin' });
+    if (!document.getElementById('qrModal')) {
+      const div = document.createElement('div');
+      div.innerHTML = `<div class="modal fade" id="qrModal" tabindex="-1"><div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><h6 class="modal-title">Show this to NGO staff</h6><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><div id="qrHolder"></div><p class="small text-muted mt-2 mb-0">Expires after 12 hours or first scan.</p></div></div></div></div>`;
+      document.body.appendChild(div);
+      qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+    }
+    await VS.renderQRCode('qrHolder', data.token);
+    qrModal.show();
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+async function loadCertificates() {
+  const wrap = document.getElementById('certList');
+  const { certificates } = await VS.get('/volunteer/certificates');
+  if (!certificates.length) {
+    wrap.innerHTML = `<div class="col-12"><div class="alert alert-light border text-center py-4">No certificates yet. When the NGO confirms a task as completed, its certificate will be added here automatically.</div></div>`;
+    return;
+  }
+  wrap.innerHTML = certificates.map(c => `
+    <div class="col-md-6">
+      <div class="card card-vs p-3">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-certificate fa-2x text-warning me-3"></i>
+          <div>
+            <h6 class="fw-bold mb-0">${c.eventTitle}</h6>
+            <p class="small text-muted mb-0">Issued by ${c.ngoName}</p>
+            <p class="small mb-0">Code: <strong>${c.code}</strong></p>
+            <p class="small text-muted mb-2">${VS.fmtDate(c.issuedAt)}</p>
+            <a class="btn btn-sm btn-vs-primary me-1" href="certificate.html?code=${encodeURIComponent(c.code)}" target="_blank"><i class="fas fa-eye me-1"></i>View</a>
+            <a class="btn btn-sm btn-vs-outline" href="certificate.html?code=${encodeURIComponent(c.code)}" target="_blank"><i class="fas fa-download me-1"></i>Download PDF</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---- Nearby Map / List ---- */
+let nearbyView = 'list';
+let gmap = null;
+function setNearbyView(view) {
+  nearbyView = view;
+  document.getElementById('viewListBtn').classList.toggle('active', view === 'list');
+  document.getElementById('viewMapBtn').classList.toggle('active', view === 'map');
+  document.getElementById('nearbyMapWrap').classList.toggle('d-none', view !== 'map');
+  document.getElementById('nearbyList').classList.toggle('d-none', view === 'map');
+  if (view === 'map') loadNearby();
+}
+async function loadNearby() {
+  const radius = document.getElementById('radiusFilter').value;
+  const { results } = await VS.get(`/volunteer/nearby?radiusKm=${radius}`);
+  const listWrap = document.getElementById('nearbyList');
+
+  if (!results.length) {
+    listWrap.innerHTML = `<div class="alert alert-light border text-center py-4">No open opportunities within ${radius} km yet.</div>`;
+  } else {
+    listWrap.innerHTML = results.map(r => `
+      <div class="card card-vs mb-2 p-3">
+        <div class="d-flex justify-content-between flex-wrap">
+          <div>
+            <h6 class="fw-bold mb-1">${r.title}</h6>
+            <p class="small text-muted mb-1"><i class="fas fa-building me-1"></i>${r.ngoName} &nbsp;|&nbsp; ${r.category}</p>
+            <span class="match-score-pill pill-location">${VS.distanceLabel(r.distanceKm)} · ~${VS.etaLabel(r.etaMinutes)}</span>
+            <span class="match-score-pill pill-skill">${r.spotsRemaining}/${r.capacity} spots left</span>
+          </div>
+          <div class="text-end"><a class="btn btn-sm btn-vs-outline" target="_blank" href="${VS.directionsUrl(r.location)}"><i class="fas fa-diamond-turn-right me-1"></i>Directions</a></div>
+        </div>
+      </div>`).join('');
+  }
+
+  if (nearbyView === 'map') {
+    const { user } = await VS.get('/profile');
+    document.getElementById('nearbyMapFallback').classList.add('d-none');
+    document.getElementById('nearbyMapWrap').classList.remove('d-none');
+    const pins = results.map(r => ({ lat: r.location.lat, lng: r.location.lng, title: r.title }));
+    if (user.location) pins.unshift({ lat: user.location.lat, lng: user.location.lng, label: 'Me', title: 'You are here' });
+    await VS.showMap('nearbyMap', user.location, pins, 10);
+  }
+}
+
+/* ---- Impact Profile ---- */
+async function loadImpact() {
+  const { impact } = await VS.get('/volunteer/impact');
+  document.getElementById('impactWrap').innerHTML = `
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${impact.completedEventsCount}</div><div class="stat-label">Events</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${impact.totalHours}</div><div class="stat-label">Hours</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${impact.certificates.length}</div><div class="stat-label">Certificates</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${impact.badges.length}</div><div class="stat-label">Badges</div></div></div>
+    </div>
+    <h6 class="fw-bold mb-2">Skills Used</h6>
+    <div class="mb-4">${impact.skillsUsed.map(s => `<span class="skill-chip">${s}</span>`).join('') || '<span class="text-muted small">None yet</span>'}</div>
+    <h6 class="fw-bold mb-2">Contribution History</h6>
+    <div class="table-responsive mb-4"><table class="table table-sm">
+      <thead><tr><th>Event</th><th>NGO</th><th>Date</th><th>Feedback</th></tr></thead>
+      <tbody>${impact.completedEvents.map(e => `<tr><td>${e.title}</td><td>${e.ngoName}</td><td>${VS.fmtDate(e.date)}</td><td>${e.rating ? VS.starRating(e.rating) : '<span class="text-muted small">—</span>'}</td></tr>`).join('') || '<tr><td colspan="4" class="text-muted text-center">No completed events yet</td></tr>'}</tbody>
+    </table></div>
+    <h6 class="fw-bold mb-2">Milestones</h6>
+    <ul class="list-group">${impact.milestones.slice(0, 15).map(m => `<li class="list-group-item small">${m.label} <span class="text-muted">— ${VS.fmtDate(m.date)}</span></li>`).join('') || '<li class="list-group-item small text-muted">No milestones yet</li>'}</ul>
+  `;
+}
+async function shareImpact() {
+  try {
+    const { shareUrl } = await VS.post('/volunteer/impact/share');
+    const full = window.location.origin + shareUrl;
+    await navigator.clipboard.writeText(full).catch(() => {});
+    prompt('Shareable link (copied to clipboard if supported):', full);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+/* ---- Badges / Leaderboard / Appreciation ---- */
+async function loadBadges() {
+  const { badges } = await VS.get('/volunteer/badges');
+  document.getElementById('badgeGrid').innerHTML = badges.map(b => `
+    <div class="col-6 col-md-4">
+      <div class="card card-vs p-3 text-center h-100 ${b.earned ? '' : 'opacity-50'}">
+        <i class="fas ${b.icon} fa-2x mb-2" style="color:${b.earned ? '#1e8e5a' : '#9e9e9e'}"></i>
+        <h6 class="fw-bold mb-1">${b.label}</h6>
+        <p class="small text-muted mb-0">${b.description}</p>
+        ${b.earned ? `<p class="small text-success mt-1 mb-0">Earned ${VS.fmtDate(b.earnedAt)}</p>` : '<p class="small text-muted mt-1 mb-0">Not yet earned</p>'}
+      </div>
+    </div>`).join('');
+}
+async function loadLeaderboard() {
+  const { user } = await VS.get('/profile');
+  document.getElementById('leaderboardToggle').checked = !!user.leaderboardOptIn;
+  const { leaderboard } = await VS.get('/leaderboard');
+  document.getElementById('leaderboardList').innerHTML = leaderboard.length ? `
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>#</th><th>Volunteer</th><th>Hours</th><th>Events</th><th>Badges</th></tr></thead>
+      <tbody>${leaderboard.map((l, i) => `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.hoursCompleted}</td><td>${l.completedEvents}</td><td>${l.badgeCount}</td></tr>`).join('')}</tbody>
+    </table></div>` : '<p class="text-muted small">No volunteers have opted into the leaderboard yet.</p>';
+}
+async function toggleLeaderboard() {
+  const optIn = document.getElementById('leaderboardToggle').checked;
+  try { await VS.put('/volunteer/leaderboard-optin', { optIn }); VS.toast('Preference saved', 'success'); loadLeaderboard(); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+async function loadAppreciationWall() {
+  const { appreciations } = await VS.get('/appreciation-wall');
+  document.getElementById('appreciationWall').innerHTML = appreciations.length ? appreciations.map(a => `
+    <div class="card card-vs p-3 mb-2"><p class="mb-1">"${a.message}"</p><p class="small text-muted mb-0">— ${a.ngoName} to ${a.volunteerName}, ${VS.fmtDate(a.createdAt)}</p></div>
+  `).join('') : '<p class="text-muted small">No appreciation messages posted yet.</p>';
+}
+
+/* ---- AI Assistant ---- */
+function appendChat(role, text) {
+  const log = document.getElementById('chatLog');
+  const bubble = document.createElement('div');
+  bubble.className = 'mb-2 ' + (role === 'user' ? 'text-end' : '');
+  bubble.innerHTML = `<span class="d-inline-block p-2 rounded ${role === 'user' ? 'bg-primary text-white' : 'bg-light border'}" style="max-width:80%;white-space:pre-wrap;">${text}</span>`;
+  log.appendChild(bubble);
+  log.scrollTop = log.scrollHeight;
+}
+document.getElementById('chatForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  appendChat('user', msg);
+  input.value = '';
+  try {
+    const { reply } = await VS.post('/volunteer/assistant', { message: msg });
+    appendChat('assistant', reply);
+  } catch (err) { appendChat('assistant', 'Sorry, something went wrong: ' + err.message); }
+});
+
+/* ---- Privacy & Notification Preferences ---- */
+async function loadPrivacy() {
+  const { privacy } = await VS.get('/volunteer/privacy');
+  document.getElementById('privacyExactLoc').checked = !!privacy.shareExactLocationWithNgos;
+  document.getElementById('privacyVisibility').value = privacy.profileVisibility || 'public';
+}
+async function savePrivacy() {
+  try {
+    await VS.put('/volunteer/privacy', {
+      shareExactLocationWithNgos: document.getElementById('privacyExactLoc').checked,
+      profileVisibility: document.getElementById('privacyVisibility').value
+    });
+    VS.toast('Privacy settings saved', 'success');
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+const NOTIF_LABELS = {
+  opportunity: 'New opportunity recommendations', application: 'Application accepted/rejected',
+  replacement: 'Replacement requests', reminder: 'Upcoming event reminders',
+  scheduleChange: 'Event location/schedule changes', attendance: 'Attendance confirmations',
+  certificate: 'Certificate availability', feedback: 'Feedback & rating notifications',
+  badge: 'Badge & milestone alerts', general: 'General announcements'
+};
+async function loadNotifPrefs() {
+  const { preferences } = await VS.get('/notifications/preferences');
+  document.getElementById('notifPrefsWrap').innerHTML = Object.keys(NOTIF_LABELS).map(key => `
+    <div class="form-check form-switch mb-2">
+      <input class="form-check-input" type="checkbox" id="pref_${key}" ${preferences[key] !== false ? 'checked' : ''} onchange="saveNotifPref('${key}', this.checked)">
+      <label class="form-check-label" for="pref_${key}">${NOTIF_LABELS[key]}</label>
+    </div>`).join('');
+}
+async function saveNotifPref(key, value) {
+  try { await VS.put('/notifications/preferences', { [key]: value }); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+
+/* ---- Micro-Volunteering ---- */
+async function loadMicroTasksVolunteer() {
+  const { tasks } = await VS.get('/volunteer/micro-tasks');
+  const wrap = document.getElementById('microTaskWrap');
+  if (!tasks.length) { wrap.innerHTML = '<div class="alert alert-light border text-center py-4">No recommended micro-tasks right now. Check back soon!</div>'; return; }
+  wrap.innerHTML = tasks.map(t => `
+    <div class="card opportunity-card mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${t.title} <span class="badge bg-info text-dark">${t.mode}</span> <span class="badge bg-secondary">${t.difficulty}</span></h6>
+          <p class="small text-muted mb-1"><i class="fas fa-building me-1"></i>${t.ngoName}</p>
+          <p class="small mb-2">${t.description}</p>
+          <span class="match-score-pill pill-skill"><i class="fas fa-clock me-1"></i>${t.estimatedMinutes} min</span>
+          ${t.requiredSkill ? `<span class="match-score-pill pill-skill">${t.requiredSkill}</span>` : ''}
+          ${t.distanceKm != null ? `<span class="match-score-pill pill-location">${VS.distanceLabel(t.distanceKm)} away</span>` : ''}
+          <p class="small text-muted mt-2 mb-0">Deadline: ${VS.fmtDate(t.deadline)} · ${t.spotsRemaining} spot(s) left</p>
+        </div>
+        <div class="text-end mt-3 mt-md-0">
+          ${t.alreadyClaimed ? '<span class="text-success small"><i class="fas fa-check-circle me-1"></i>Submitted</span>' :
+            `<button class="btn btn-vs-primary btn-sm" onclick="openMicroSubmit('${t.id}','${t.title.replace(/'/g,"\\'")}')"><i class="fas fa-paper-plane me-1"></i>Submit Work</button>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+function openMicroSubmit(taskId, title) {
+  const submissionText = prompt(`Submit your work for "${title}" (paste text, or describe what you did):`);
+  if (!submissionText) return;
+  const submissionUrl = prompt('Optional: link to your work (Google Doc, image, etc.) — leave blank if none:');
+  VS.post(`/micro-tasks/${taskId}/submit`, { submissionText, submissionUrl: submissionUrl || '' })
+    .then(() => { VS.toast('Submitted! The NGO will review your work.', 'success'); loadMicroTasksVolunteer(); })
+    .catch(err => VS.toast(err.message, 'error'));
+}
+
+/* ---- Community Need Map (volunteer view) ---- */
+async function loadNeedMapVolunteer() {
+  const category = document.getElementById('vNeedCategoryFilter').value;
+  const { points } = await VS.get(`/community-need?category=${category}`);
+  const colorFor = level => level === 'High' ? '#e53935' : level === 'Medium' ? '#ffb300' : '#43a047';
+  document.getElementById('vNeedMapList').innerHTML = points.length ? points.map(p => `
+    <div class="card card-vs mb-2 p-2 px-3 d-flex flex-row justify-content-between align-items-center">
+      <span><span class="need-dot" style="background:${colorFor(p.needLevel)}"></span>${p.category} — ${p.needLevel} need (${p.unfilled} unfilled)</span>
+    </div>`).join('') : '<p class="text-muted small">No unmet needs right now — great news!</p>';
+
+  const { user } = await VS.get('/profile');
+  document.getElementById('vNeedMapFallback').classList.add('d-none');
+  document.getElementById('vNeedMapWrap').classList.remove('d-none');
+  await VS.showMap('vNeedMap', user.location, points.map(p => ({
+    lat: p.lat, lng: p.lng, title: `${p.category}: ${p.needLevel} need`,
+    color: colorFor(p.needLevel), radius: 10 + Math.min(p.unfilled, 10)
+  })), 8);
+}
+
+/* ---- Impact Score ---- */
+async function loadImpactScore() {
+  const { impactScore } = await VS.get('/volunteer/impact-score');
+  document.getElementById('impactScoreValue').innerText = impactScore.totalScore;
+  document.getElementById('impactRing').style.setProperty('--pct', Math.min(100, Math.round(impactScore.totalScore / 9)));
+  document.getElementById('isHours').innerText = impactScore.totalHours;
+  document.getElementById('isEvents').innerText = impactScore.eventsCompleted;
+  document.getElementById('isTasks').innerText = impactScore.tasksCompleted;
+  document.getElementById('isNgos').innerText = impactScore.ngosSupported;
+
+  const maxCat = Math.max(1, ...Object.values(impactScore.categoryBreakdown));
+  document.getElementById('categoryBars').innerHTML = Object.entries(impactScore.categoryBreakdown).map(([cat, hrs]) => `
+    <div class="mb-2">
+      <div class="d-flex justify-content-between small mb-1"><span>${cat}</span><span>${hrs} hrs</span></div>
+      <div class="category-bar-wrap"><div class="category-bar" style="width:${Math.round((hrs / maxCat) * 100)}%"></div></div>
+    </div>`).join('');
+
+  const { timeline } = await VS.get('/volunteer/impact-timeline');
+  document.getElementById('impactTimeline').innerHTML = timeline.length ? timeline.slice(0, 20).map(t => `
+    <div class="timeline-item"><strong>${t.label}</strong><br><span class="small text-muted">${VS.fmtDate(t.date)}</span></div>
+  `).join('') : '<p class="text-muted small">No contribution history yet.</p>';
+}
+
+/* ---- Skill Passport ---- */
+async function loadSkillPassport() {
+  const { passport } = await VS.get('/volunteer/skill-passport');
+  const wrap = document.getElementById('passportWrap');
+  if (!passport.skills.length) { wrap.innerHTML = '<div class="col-12"><div class="alert alert-light border text-center py-4">No verified skills yet. Complete events or micro-tasks to build your passport.</div></div>'; return; }
+  wrap.innerHTML = passport.skills.map(s => `
+    <div class="col-md-6">
+      <div class="passport-card">
+        <h6 class="fw-bold mb-1">${s.skill} <span class="badge badge-verified ms-1"><i class="fas fa-check me-1"></i>Verified</span></h6>
+        <p class="small text-muted mb-1">Level: ${s.level} · ${s.totalHours} hour(s)</p>
+        <p class="small mb-1"><strong>Demonstrated in:</strong> ${s.projects.join(', ')}</p>
+        ${s.certificates.length ? `<p class="small mb-0"><strong>Certificates:</strong> ${s.certificates.map(c=>c.code).join(', ')}</p>` : ''}
+      </div>
+    </div>`).join('');
+}
+async function sharePassport() {
+  try {
+    const { shareUrl } = await VS.post('/volunteer/share/skillpassport');
+    const full = window.location.origin + shareUrl;
+    await navigator.clipboard.writeText(full).catch(() => {});
+    prompt('Shareable Skill Passport link (copied to clipboard if supported):', full);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+loadProfile();
+loadOpportunities();
+loadCertificates();
+loadNotifications('notifBadge', 'notifList');
+setInterval(() => { loadOpportunities(); loadNotifications('notifBadge', 'notifList'); loadProfile(); }, 15000);
+</script>
+</body>
+</html>

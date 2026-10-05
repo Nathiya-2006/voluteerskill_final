@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NGO Registration | VolunteerSkill</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg vs-navbar py-3">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><i class="fas fa-hands-helping me-2"></i>VolunteerSkill</a>
+    <div class="ms-auto">
+      <a href="login.html" class="btn btn-vs-outline btn-sm">Already have an account? Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card auth-card">
+    <div class="auth-header">
+      <i class="fas fa-building fa-2x mb-2"></i>
+      <h4 class="mb-0">NGO Registration</h4>
+      <p class="mb-0 small">Register your organization to start posting opportunities.</p>
+    </div>
+    <div class="card-body p-4">
+      <div id="alertBox"></div>
+      <form id="ngoForm">
+        <div class="mb-3">
+          <label class="form-label">NGO Name</label>
+          <input type="text" class="form-control" name="ngoName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Registration Number</label>
+          <input type="text" class="form-control" name="registrationNumber" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Address</label>
+          <input type="text" class="form-control" name="address" required>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Latitude</label>
+            <input type="number" step="any" class="form-control" name="lat" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Longitude</label>
+            <input type="number" step="any" class="form-control" name="lng" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <button type="button" class="btn btn-sm btn-vs-outline" id="useLocationBtn"><i class="fas fa-location-crosshairs me-1"></i>Use Current Location</button>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" name="description" rows="3" placeholder="What does your NGO do?"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" name="password" minlength="6" required>
+        </div>
+        <div class="alert alert-info small"><i class="fas fa-info-circle me-1"></i>Your NGO will need admin verification before you can post events.</div>
+        <button type="submit" class="btn btn-vs-primary w-100 py-2" id="submitBtn">
+          <i class="fas fa-check-circle me-2"></i>Register NGO
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('useLocationBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) return VS.toast('Geolocation not supported', 'error');
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.querySelector('[name=lat]').value = pos.coords.latitude.toFixed(6);
+    document.querySelector('[name=lng]').value = pos.coords.longitude.toFixed(6);
+    VS.toast('Location captured!', 'success');
+  }, () => VS.toast('Could not fetch location. Enter manually.', 'error'));
+});
+
+document.getElementById('ngoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registering...';
+
+  const form = e.target;
+  const payload = {
+    ngoName: form.ngoName.value,
+    registrationNumber: form.registrationNumber.value,
+    address: form.address.value,
+    location: { lat: parseFloat(form.lat.value), lng: parseFloat(form.lng.value) },
+    description: form.description.value,
+    email: form.email.value,
+    password: form.password.value
+  };
+
+  try {
+    const data = await VS.post('/auth/register/ngo', payload);
+    VS.setSession(data.token, data.role, data.user);
+    VS.toast('NGO account created! Redirecting...', 'success');
+    setTimeout(() => window.location.href = 'ngo-dashboard.html', 800);
+  } catch (err) {
+    document.getElementById('alertBox').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Register NGO';
+  }
+});
+</script>
+</body>
+</html>

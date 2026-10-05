@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VolunteerSkill - Certificate Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Great+Vibes&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2ef;font-family:Poppins,Arial,sans-serif;color:#1f2d27}
+.panel{max-width:1000px;margin:14px auto;background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+h1{font-size:18px;margin:0 0 10px;color:#14532d}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label{font-size:12px;color:#5b6b63;display:block;margin-bottom:3px}
+input{width:100%;padding:9px;border:1px solid #cdd9d1;border-radius:8px;font-size:14px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button{padding:10px 16px;border:0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#1b6b45;color:#fff}
+button.alt{background:#fff;color:#1b6b45;border:1.5px solid #1b6b45}
+#msg{font-size:12px;color:#5b6b63;margin-top:8px}
+.stage{overflow:hidden;padding:0 12px 24px}
+#holder{margin:0 auto;transform-origin:top left}
+#cert{width:1123px;height:794px;position:relative;background:#fffdf7;box-shadow:0 8px 30px rgba(0,0,0,.18);overflow:hidden}
+.o{position:absolute;inset:18px;border:6px solid #1b6b45}
+.i{position:absolute;inset:34px;border:2px solid #c9a24b}
+.cn{position:absolute;width:70px;height:70px;border:4px solid #c9a24b}
+.tl{top:46px;left:46px;border-right:0;border-bottom:0}
+.tr{top:46px;right:46px;border-left:0;border-bottom:0}
+.bl{bottom:46px;left:46px;border-right:0;border-top:0}
+.br{bottom:46px;right:46px;border-left:0;border-top:0}
+.c{position:absolute;inset:60px 90px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.brand{font-weight:600;letter-spacing:4px;color:#1b6b45;font-size:15px;margin-top:6px}
+.t{font-family:'Playfair Display',Georgia,serif;font-size:50px;font-weight:700;color:#14532d;margin-top:8px;letter-spacing:2px}
+.st{font-size:16px;letter-spacing:6px;color:#a07c25;font-weight:500}
+.pr{margin-top:26px;font-size:15px;color:#555}
+.nm{font-family:'Great Vibes','Brush Script MT',cursive;font-size:70px;color:#14532d;line-height:1.1;border-bottom:2px solid #c9a24b;padding:0 40px 2px;min-width:420px}
+.bd{margin-top:18px;font-size:16px;line-height:1.7;color:#333;max-width:780px}
+.bd b{color:#14532d}
+.work-label{display:block;margin-top:10px;color:#a07c25;font-size:12px;font-weight:600;letter-spacing:1.5px}
+.skills-used{margin-top:3px;font-size:15px;color:#14532d}
+.mt{margin-top:14px;display:flex;gap:34px;justify-content:center;font-size:13px;color:#555;flex-wrap:wrap}
+.mt b{display:block;color:#14532d;font-size:15px}
+.ft{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end}
+.sg{width:240px;text-align:center;font-size:12px;color:#555}
+.signature{height:39px;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes','Brush Script MT',cursive;font-size:31px;color:#14532d;transform:rotate(-4deg)}
+.signature-line{border-top:1.5px solid #333;padding-top:4px}
+.seal{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,#e2c066,#c9a24b 70%);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:600;font-size:11px;border:4px double #fff;box-shadow:0 0 0 3px #c9a24b;line-height:1.2}
+.vf{width:240px;text-align:right;font-size:11px;color:#555}
+.code{font-family:monospace;font-weight:700;color:#14532d;font-size:13px;word-break:break-all}
+#state{max-width:700px;margin:40px auto;padding:16px;text-align:center}
+.alert{padding:12px 16px;margin-bottom:12px;border:1px solid #f1b8bd;border-radius:8px;background:#f8d7da;color:#842029}
+.btn{display:inline-block;padding:8px 12px;border:1px solid #1b6b45;border-radius:6px;color:#1b6b45;text-decoration:none;font-size:13px}
+.btn-success{background:#1b6b45;color:#fff}
+.btn-outline-secondary{border-color:#68736d;color:#4f5a54}
+.ms-2{margin-left:8px}
+.notice{max-width:1000px;margin:0 auto 12px;padding:0 16px;color:#58655e;font-size:12px}
+@page{size:A4 landscape;margin:0}
+@media print{
+  body{background:#fff}
+  .panel,.notice{display:none!important}
+  .stage{padding:0;overflow:visible}
+  #holder{transform:none!important;margin:0!important;width:1123px!important;height:794px!important}
+  #cert{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<main class="panel">
+  <h1>VolunteerSkill - Certificate Generator</h1>
+  <div class="grid">
+    <div><label for="name">Volunteer name</label><input id="name" value="Nathiya"></div>
+    <div><label for="event">Event / task title</label><input id="event" value="Planting the Trees"></div>
+    <div><label for="ngo">NGO / organiser</label><input id="ngo" value="environmental"></div>
+    <div><label for="hours">Hours</label><input id="hours" type="number" min="0" step="0.1" value="4"></div>
+    <div><label for="edate">Event date</label><input id="edate" type="date" value="2026-10-05"></div>
+    <div><label for="skills">Skills (optional)</label><input id="skills" value="Teaching, Cooking, IT Support, Gardening, Social Media, Public Speaking"></div>
+    <div><label for="loc">Location (optional)</label><input id="loc" value="Tirunelveli"></div>
+    <div><label for="code">Print copy ID</label><input id="code" readonly></div>
+  </div>
+  <div class="btns">
+    <button id="pdf" type="button">Download PDF</button>
+    <button class="alt" id="png" type="button">Download Image (PNG)</button>
+    <button class="alt" id="print" type="button">Print / Save as PDF</button>
+    <button class="alt" id="newcode" type="button">New ID</button>
+  </div>
+  <div id="msg" role="status" aria-live="polite">Edit the details as needed. This is a printable certificate, not an app-verified credential.</div>
+</main>
+<p class="notice">The print copy ID is generated locally and cannot be used to verify a certificate in VolunteerSkill.</p>
+<div id="state" role="status" aria-live="polite" hidden></div>
+<div class="stage"><div id="holder"><div id="cert"></div></div></div>
+<script>
+const $ = id => document.getElementById(id);
+let issuedCertificate = null;
+const esc = value => String(value).replace(/[&<>"']/g, char => ({
+  '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+}[char]));
+const fmt = value => value
+  ? new Date(`${value}T12:00:00`).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })
+  : '';
+
+function newCode() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const randomPart = Array.from({ length:6 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+  $('code').value = `PRINT-${randomPart}`;
+}
+
+function render() {
+  const skills = $('skills').value.trim();
+  const hours = $('hours').value.trim();
+  const eventDate = $('edate').value;
+  const location = $('loc').value.trim();
+  const name = $('name').value.trim() || 'Volunteer';
+  const event = $('event').value.trim() || 'Volunteer service';
+  const ngo = $('ngo').value.trim() || 'Organiser';
+  $('cert').innerHTML = `
+    <div class="o"></div><div class="i"></div>
+    <div class="cn tl"></div><div class="cn tr"></div><div class="cn bl"></div><div class="cn br"></div>
+    <div class="c">
+      <div class="brand">VOLUNTEERSKILL</div>
+      <div class="t">Certificate</div>
+      <div class="st">OF VOLUNTEER SERVICE</div>
+      <div class="pr">This certificate is presented to</div>
+      <div class="nm">${esc(name)}</div>
+      <div class="bd">
+        in recognition of dedication and completion of <b>${esc(event)}</b>, organised by <b>${esc(ngo)}</b>.
+        ${skills ? `<span class="work-label">COMPLETED WORK &amp; SKILLS USED</span><div class="skills-used">${esc(skills)}</div>` : ''}
+      </div>
+      <div class="mt">
+        ${hours ? `<div>Service Time<b>${esc(hours)} hour${hours === '1' ? '' : 's'}</b></div>` : ''}
+        ${eventDate ? `<div>Event Date<b>${esc(fmt(eventDate))}</b></div>` : ''}
+        ${location ? `<div>Location<b>${esc(location)}</b></div>` : ''}
+        <div>Date of Issue<b>${esc(fmt(issuedCertificate ? issuedCertificate.issuedAt : new Date().toISOString().slice(0, 10)))}</b></div>
+      </div>
+      <div class="ft">
+        <div class="sg">
+          <div class="signature">${esc(ngo)}</div>
+          <div class="signature-line">Sample organiser signature</div>
+        </div>
+        <div class="seal">${issuedCertificate ? 'VERIFIED<br>VOLUNTEER' : 'VOLUNTEER<br>SERVICE'}</div>
+        <div class="vf">${issuedCertificate ? 'Verified Certificate ID' : 'Print copy ID'}<br><span class="code">${esc($('code').value)}</span></div>
+      </div>
+    </div>`;
+}
+
+function showVerificationError(message) {
+  document.querySelector('.panel').hidden = true;
+  document.querySelector('.notice').hidden = true;
+  document.querySelector('.stage').hidden = true;
+  const state = $('state');
+  state.hidden = false;
+  state.innerHTML = `<div class="alert alert-danger">${esc(message)}</div>
+    <a class="btn btn-success btn-sm" href="login.html">NGO sign in</a>
+    <a class="btn btn-outline-secondary btn-sm ms-2" href="certificate.html">Open print generator</a>`;
+}
+
+async function loadIssuedCertificate(code) {
+  document.querySelector('.panel').hidden = true;
+  document.querySelector('.notice').hidden = true;
+  const state = $('state');
+  state.hidden = false;
+  state.textContent = 'Verifying certificate...';
+  try {
+    const response = await fetch(`/api/certificates/verify/${encodeURIComponent(code)}`);
+    const data = await response.json();
+    if (!response.ok || !data.valid || !data.certificate) {
+      throw new Error(response.status === 404 ? 'No issued certificate matches this code.' : (data.error || 'Certificate verification failed.'));
+    }
+    issuedCertificate = data.certificate;
+    $('name').value = issuedCertificate.volunteerName || 'Volunteer';
+    $('event').value = issuedCertificate.eventTitle || 'Volunteer service';
+    $('ngo').value = issuedCertificate.ngoName || 'Organiser';
+    $('hours').value = issuedCertificate.hours == null ? '' : issuedCertificate.hours;
+    $('edate').value = issuedCertificate.eventDate ? String(issuedCertificate.eventDate).slice(0, 10) : '';
+    $('skills').value = Array.isArray(issuedCertificate.skills) ? issuedCertificate.skills.join(', ') : '';
+    $('loc').value = issuedCertificate.location || '';
+    $('code').value = issuedCertificate.code;
+    document.querySelectorAll('.grid input').forEach(input => { input.readOnly = true; });
+    $('newcode').hidden = true;
+    $('msg').textContent = `Verified certificate ${issuedCertificate.code}. Download or print this issued certificate.`;
+    document.querySelector('.panel').hidden = false;
+    state.hidden = true;
+    render();
+    fit();
+  } catch (error) {
+    showVerificationError(error.message || 'Could not verify this certificate. Check your connection and try again.');
+  }
+}
+
+function fit() {
+  const scale = Math.min(1, Math.max(0.1, (innerWidth - 24) / 1123));
+  $('holder').style.transform = `scale(${scale})`;
+  $('holder').style.width = '1123px';
+  $('holder').style.height = `${794 * scale}px`;
+  $('holder').style.marginLeft = `${Math.max(0, (innerWidth - 24 - 1123 * scale) / 2)}px`;
+}
+
+const scriptPromises = new Map();
+function loadScript(src) {
+  if (!scriptPromises.has(src)) {
+    scriptPromises.set(src, new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => {
+        scriptPromises.delete(src);
+        reject(new Error('Could not load the certificate export library. Check your internet connection or use Print / Save as PDF.'));
+      };
+      document.head.appendChild(script);
+    }));
+  }
+  return scriptPromises.get(src);
+}
+
+async function capture() {
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const holder = $('holder');
+  const oldStyles = {
+    transform: holder.style.transform,
+    marginLeft: holder.style.marginLeft,
+    height: holder.style.height
+  };
+  holder.style.transform = 'none';
+  holder.style.marginLeft = '0';
+  holder.style.height = '794px';
+  try {
+    return await html2canvas($('cert'), { scale:2, backgroundColor:'#fffdf7', useCORS:true });
+  } finally {
+    holder.style.transform = oldStyles.transform;
+    holder.style.marginLeft = oldStyles.marginLeft;
+    holder.style.height = oldStyles.height;
+  }
+}
+
+function fileName(extension) {
+  const name = $('name').value.trim().replace(/[^\w]+/g, '_') || 'Volunteer';
+  return `Certificate-${name}.${extension}`;
+}
+
+async function downloadPdf() {
+  $('pdf').disabled = true;
+  $('msg').textContent = 'Preparing PDF...';
+  try {
+    const canvas = await capture();
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const pdf = new window.jspdf.jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 297, 210);
+    pdf.save(fileName('pdf'));
+    $('msg').textContent = 'PDF downloaded.';
+  } catch (error) {
+    $('msg').textContent = `${error.message} Use Print / Save as PDF as an alternative.`;
+  } finally {
+    $('pdf').disabled = false;
+  }
+}
+
+async function downloadPng() {
+  $('png').disabled = true;
+  $('msg').textContent = 'Preparing image...';
+  try {
+    const canvas = await capture();
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = fileName('png');
+    link.click();
+    $('msg').textContent = 'Image downloaded.';
+  } catch (error) {
+    $('msg').textContent = `${error.message} Use Print / Save as PDF as an alternative.`;
+  } finally {
+    $('png').disabled = false;
+  }
+}
+
+['name','event','ngo','hours','edate','skills','loc'].forEach(id => $(id).addEventListener('input', render));
+$('pdf').addEventListener('click', downloadPdf);
+$('png').addEventListener('click', downloadPng);
+$('print').addEventListener('click', () => window.print());
+$('newcode').addEventListener('click', () => { newCode(); render(); });
+window.addEventListener('resize', fit);
+const requestedCode = new URLSearchParams(location.search).get('code');
+if (requestedCode && requestedCode.trim()) {
+  loadIssuedCertificate(requestedCode.trim());
+} else {
+  newCode();
+  render();
+  fit();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | VolunteerSkill</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg vs-navbar py-3">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="admin-dashboard.html"><i class="fas fa-hands-helping me-2"></i>VolunteerSkill <span class="badge bg-dark ms-1">Admin</span></a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span class="fw-semibold" id="userNameTop"></span>
+      <button class="btn btn-sm btn-outline-danger" onclick="VS.logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_vol">0</div><div class="stat-label">Volunteers</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_ngo">0</div><div class="stat-label">Total NGOs</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_verified">0</div><div class="stat-label">Verified</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_pending">0</div><div class="stat-label">Pending</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_events">0</div><div class="stat-label">Events</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="s_certs">0</div><div class="stat-label">Certificates</div></div></div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pendingTab">Pending Verification</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#allNgoTab">All NGOs</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#volTab">Volunteers</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#analyticsTab" onclick="loadAnalytics()">Analytics</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#reportsTab" onclick="loadReports()">Reports</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#auditTab" onclick="loadAuditLogs()">Audit Log</button></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="pendingTab">
+      <div id="pendingList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+    <div class="tab-pane fade" id="allNgoTab">
+      <div id="allNgoList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+    <div class="tab-pane fade" id="volTab">
+      <div id="volList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="analyticsTab">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="section-title mb-0"><i class="fas fa-chart-line me-2"></i>Platform Analytics</h4>
+        <div class="d-flex gap-2 flex-wrap">
+          <input type="date" class="form-control form-control-sm" id="analyticsFrom">
+          <input type="date" class="form-control form-control-sm" id="analyticsTo">
+          <button class="btn btn-sm btn-vs-outline" onclick="loadAnalytics()"><i class="fas fa-filter me-1"></i>Apply</button>
+          <a class="btn btn-sm btn-vs-primary" href="/api/admin/analytics/export"><i class="fas fa-download me-1"></i>Export CSV</a>
+        </div>
+      </div>
+      <div id="analyticsWrap"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="reportsTab">
+      <h4 class="section-title mb-3"><i class="fas fa-flag me-2"></i>User & Event Reports</h4>
+      <div id="reportsList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="auditTab">
+      <h4 class="section-title mb-3"><i class="fas fa-clipboard-list me-2"></i>Audit Log</h4>
+      <div id="auditList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+if (!VS.requireAuth(['admin'])) { /* redirected */ }
+
+async function loadStats() {
+  const s = await VS.get('/admin/stats');
+  document.getElementById('s_vol').innerText = s.totalVolunteers;
+  document.getElementById('s_ngo').innerText = s.totalNgos;
+  document.getElementById('s_verified').innerText = s.verifiedNgos;
+  document.getElementById('s_pending').innerText = s.pendingNgos;
+  document.getElementById('s_events').innerText = s.totalEvents;
+  document.getElementById('s_certs').innerText = s.totalCertificates;
+}
+
+function ngoCard(n) {
+  return `
+    <div class="card card-vs mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${n.ngoName} ${n.verified ? '<span class="badge badge-verified">Verified</span>' : '<span class="badge badge-unverified">Pending</span>'}</h6>
+          <p class="small text-muted mb-1"><i class="fas fa-hashtag me-1"></i>Reg#: ${n.registrationNumber}</p>
+          <p class="small text-muted mb-1"><i class="fas fa-envelope me-1"></i>${n.email}</p>
+          <p class="small text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i>${n.address}</p>
+          <p class="small mb-0">${n.description || ''}</p>
+        </div>
+        <div class="text-end mt-3 mt-md-0">
+          ${!n.verified ? `<button class="btn btn-sm btn-vs-primary" onclick="verify('${n.id}')"><i class="fas fa-check me-1"></i>Verify</button>` :
+            `<button class="btn btn-sm btn-outline-secondary" onclick="unverify('${n.id}')"><i class="fas fa-ban me-1"></i>Revoke</button>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+async function loadNgos() {
+  const { ngos } = await VS.get('/admin/ngos');
+  const pending = ngos.filter(n => !n.verified);
+  document.getElementById('pendingList').innerHTML = pending.length
+    ? pending.map(ngoCard).join('')
+    : `<div class="alert alert-light border text-center py-4">No NGOs pending verification. 🎉</div>`;
+  document.getElementById('allNgoList').innerHTML = ngos.length
+    ? ngos.map(ngoCard).join('')
+    : `<div class="alert alert-light border text-center py-4">No NGOs registered yet.</div>`;
+}
+
+async function loadVolunteers() {
+  const { volunteers } = await VS.get('/admin/volunteers');
+  document.getElementById('volList').innerHTML = volunteers.length ? volunteers.map(v => `
+    <div class="card card-vs mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${v.name}</h6>
+          <p class="small text-muted mb-1"><i class="fas fa-envelope me-1"></i>${v.email} &nbsp; <i class="fas fa-phone ms-2 me-1"></i>${v.phone}</p>
+          <p class="small text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i>${v.location?.address || (v.location.lat.toFixed(2)+', '+v.location.lng.toFixed(2))}</p>
+          <div>${(v.skills||[]).map(s=>`<span class="skill-chip">${s}</span>`).join('')}</div>
+        </div>
+        <div class="text-end">
+          <div>${VS.starRating(v.rating)}</div>
+          <p class="small text-muted mb-0">${v.completedEvents.length} completed</p>
+        </div>
+      </div>
+    </div>
+  `).join('') : `<div class="alert alert-light border text-center py-4">No volunteers registered yet.</div>`;
+}
+
+async function verify(id) {
+  try { await VS.put(`/admin/ngos/${id}/verify`); VS.toast('NGO verified', 'success'); loadNgos(); loadStats(); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+async function unverify(id) {
+  try { await VS.put(`/admin/ngos/${id}/reject`); VS.toast('Verification revoked', 'info'); loadNgos(); loadStats(); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+
+/* ---- Analytics ---- */
+async function loadAnalytics() {
+  const from = document.getElementById('analyticsFrom').value;
+  const to = document.getElementById('analyticsTo').value;
+  const qs = new URLSearchParams({ ...(from && { from }), ...(to && { to }) }).toString();
+  const a = await VS.get(`/admin/analytics${qs ? '?' + qs : ''}`);
+  document.getElementById('analyticsWrap').innerHTML = `
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.volunteerParticipationRate}%</div><div class="stat-label">Participation Rate</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.eventCancellationRate}%</div><div class="stat-label">Cancellation Rate</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.totalVolunteeringHours}</div><div class="stat-label">Total Hours</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.totalMicroTasks}</div><div class="stat-label">Micro-Tasks</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.microTasksCompleted}</div><div class="stat-label">Tasks Completed</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">${a.openReports}</div><div class="stat-label">Open Reports</div></div></div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h6 class="fw-bold mb-2">Most Requested Skills</h6>
+        <canvas id="skillsChart" height="220"></canvas>
+      </div>
+      <div class="col-md-6">
+        <h6 class="fw-bold mb-2">Geographic Activity (volunteer density by area)</h6>
+        <div style="max-height:260px;overflow:auto">
+          <table class="table table-sm"><thead><tr><th>Lat</th><th>Lng</th><th>Volunteers</th></tr></thead>
+          <tbody>${a.geographicDistribution.map(g => `<tr><td>${g.lat}</td><td>${g.lng}</td><td>${g.volunteerCount}</td></tr>`).join('') || '<tr><td colspan="3" class="text-muted text-center">No data yet</td></tr>'}</tbody></table>
+        </div>
+      </div>
+    </div>
+  `;
+  await VS.loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js');
+  const ctx = document.getElementById('skillsChart');
+  if (ctx && a.mostRequestedSkills.length) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: a.mostRequestedSkills.map(s => s.skill), datasets: [{ label: 'Requests', data: a.mostRequestedSkills.map(s => s.count), backgroundColor: '#1e8e5a' }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+}
+
+/* ---- Reports ---- */
+async function loadReports() {
+  const { reports } = await VS.get('/admin/reports');
+  document.getElementById('reportsList').innerHTML = reports.length ? reports.map(r => `
+    <div class="card card-vs mb-2 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <p class="mb-1"><span class="badge ${r.status==='open'?'bg-warning text-dark':'bg-success'}">${r.status}</span> <strong>${r.type}</strong> — ${r.targetId}</p>
+          <p class="small mb-1">${r.reason}</p>
+          <p class="small text-muted mb-0">Reported by ${r.reporterRole} on ${VS.fmtDate(r.createdAt)}</p>
+        </div>
+        ${r.status === 'open' ? `<button class="btn btn-sm btn-vs-primary align-self-center" onclick="resolveReport('${r.id}')">Resolve</button>` : `<span class="small text-muted align-self-center">${r.resolution || ''}</span>`}
+      </div>
+    </div>`).join('') : '<div class="alert alert-light border text-center py-4">No reports filed.</div>';
+}
+async function resolveReport(id) {
+  const resolution = prompt('Resolution notes:');
+  if (resolution == null) return;
+  try { await VS.put(`/admin/reports/${id}/resolve`, { resolution }); VS.toast('Report resolved', 'success'); loadReports(); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+
+/* ---- Audit Log ---- */
+async function loadAuditLogs() {
+  const { logs } = await VS.get('/admin/audit-logs');
+  document.getElementById('auditList').innerHTML = logs.length ? `
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+      <tbody>${logs.map(l => `<tr><td class="small">${new Date(l.createdAt).toLocaleString()}</td><td class="small">${l.actorRole}</td><td class="small">${l.action}</td><td class="small">${l.targetType}:${(l.targetId||'').slice(0,8)}</td><td class="small">${l.details||''}</td></tr>`).join('')}</tbody>
+    </table></div>` : '<div class="alert alert-light border text-center py-4">No audit entries yet.</div>';
+}
+
+(async () => {
+  const { user } = await VS.get('/profile');
+  document.getElementById('userNameTop').innerText = user.name || user.email;
+})();
+
+loadStats();
+loadNgos();
+loadVolunteers();
+setInterval(() => { loadStats(); loadNgos(); }, 20000);
+</script>
+</body>
+</html>

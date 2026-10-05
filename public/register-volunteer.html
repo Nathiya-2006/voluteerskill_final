@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volunteer Registration | VolunteerSkill</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg vs-navbar py-3">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><i class="fas fa-hands-helping me-2"></i>VolunteerSkill</a>
+    <div class="ms-auto">
+      <a href="login.html" class="btn btn-vs-outline btn-sm">Already have an account? Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card auth-card" style="max-width: 720px;">
+    <div class="auth-header">
+      <i class="fas fa-user-plus fa-2x mb-2"></i>
+      <h4 class="mb-0">Volunteer Registration</h4>
+      <p class="mb-0 small">Tell us about yourself so we can match you perfectly.</p>
+    </div>
+    <div class="card-body p-4">
+      <div id="alertBox"></div>
+      <form id="volForm">
+        <h6 class="fw-bold text-success mb-3"><i class="fas fa-id-card me-1"></i> Basic Info</h6>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" required>
+          </div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" name="phone" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" minlength="6" required>
+          </div>
+        </div>
+
+        <h6 class="fw-bold text-success mb-3 mt-4"><i class="fas fa-map-marker-alt me-1"></i> Location</h6>
+        <div class="row g-3 mb-2">
+          <div class="col-md-4">
+            <label class="form-label">Latitude</label>
+            <input type="number" step="any" class="form-control" name="lat" required placeholder="e.g. 13.0827">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Longitude</label>
+            <input type="number" step="any" class="form-control" name="lng" required placeholder="e.g. 80.2707">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">City / Area</label>
+            <input type="text" class="form-control" name="address" placeholder="e.g. Chennai">
+          </div>
+        </div>
+        <div class="mb-3">
+          <button type="button" class="btn btn-sm btn-vs-outline" id="useLocationBtn"><i class="fas fa-location-crosshairs me-1"></i>Use My Current Location</button>
+        </div>
+
+        <h6 class="fw-bold text-success mb-3 mt-4"><i class="fas fa-toolbox me-1"></i> Skills</h6>
+        <div class="mb-3">
+          <label class="form-label">Select all skills that apply</label>
+          <div id="skillsWrap" class="d-flex flex-wrap gap-2">
+            <!-- checkboxes injected by JS -->
+          </div>
+        </div>
+
+        <h6 class="fw-bold text-success mb-3 mt-4"><i class="fas fa-calendar-check me-1"></i> Availability</h6>
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Day</label>
+            <select class="form-select" id="availDay">
+              <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+              <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Time of Day</label>
+            <select class="form-select" id="availTime">
+              <option>Morning</option><option>Afternoon</option><option>Evening</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-vs-primary w-100" id="addAvailBtn"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div id="availList" class="mb-3"></div>
+
+        <h6 class="fw-bold text-success mb-3 mt-4"><i class="fas fa-briefcase me-1"></i> Experience & Interests</h6>
+        <div class="mb-3">
+          <label class="form-label">Experience (brief description)</label>
+          <textarea class="form-control" name="experience" rows="2" placeholder="e.g. 2 years teaching underprivileged children"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Preferred Categories</label>
+          <div class="d-flex flex-wrap gap-2" id="categoriesWrap"></div>
+        </div>
+
+        <button type="submit" class="btn btn-vs-primary w-100 py-2 mt-3" id="submitBtn">
+          <i class="fas fa-check-circle me-2"></i>Create Volunteer Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+const SKILLS = ['Teaching','First Aid','Cooking','Event Management','Photography','Fundraising',
+  'Counseling','IT Support','Carpentry','Gardening','Driving','Translation','Social Media','Public Speaking','Healthcare'];
+const CATEGORIES = ['Education','Health','Environment','Disaster Relief','Animal Welfare','Elderly Care','Child Welfare','Community Development'];
+
+const skillsWrap = document.getElementById('skillsWrap');
+SKILLS.forEach(s => {
+  skillsWrap.innerHTML += `
+    <div class="form-check form-check-inline border rounded px-3 py-2">
+      <input class="form-check-input" type="checkbox" value="${s}" id="sk_${s}" name="skills">
+      <label class="form-check-label small" for="sk_${s}">${s}</label>
+    </div>`;
+});
+
+const catWrap = document.getElementById('categoriesWrap');
+CATEGORIES.forEach(c => {
+  catWrap.innerHTML += `
+    <div class="form-check form-check-inline border rounded px-3 py-2">
+      <input class="form-check-input" type="checkbox" value="${c}" id="cat_${c}" name="categories">
+      <label class="form-check-label small" for="cat_${c}">${c}</label>
+    </div>`;
+});
+
+let availability = [];
+document.getElementById('addAvailBtn').addEventListener('click', () => {
+  const day = document.getElementById('availDay').value;
+  const timeOfDay = document.getElementById('availTime').value;
+  if (availability.some(a => a.day === day && a.timeOfDay === timeOfDay)) return;
+  availability.push({ day, timeOfDay });
+  renderAvail();
+});
+function renderAvail() {
+  const list = document.getElementById('availList');
+  list.innerHTML = availability.map((a, i) => `
+    <span class="skill-chip me-2 mb-2">${a.day} - ${a.timeOfDay}
+      <i class="fas fa-times ms-1" style="cursor:pointer" onclick="removeAvail(${i})"></i>
+    </span>`).join('') || '<span class="text-muted small">No slots added yet</span>';
+}
+function removeAvail(i) { availability.splice(i, 1); renderAvail(); }
+renderAvail();
+
+document.getElementById('useLocationBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) return VS.toast('Geolocation not supported', 'error');
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.querySelector('[name=lat]').value = pos.coords.latitude.toFixed(6);
+    document.querySelector('[name=lng]').value = pos.coords.longitude.toFixed(6);
+    VS.toast('Location captured!', 'success');
+  }, () => VS.toast('Could not fetch location. Enter manually.', 'error'));
+});
+
+document.getElementById('volForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+
+  const form = e.target;
+  const skills = Array.from(form.querySelectorAll('[name=skills]:checked')).map(el => el.value);
+  const preferredCategories = Array.from(form.querySelectorAll('[name=categories]:checked')).map(el => el.value);
+
+  const payload = {
+    name: form.name.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    password: form.password.value,
+    location: {
+      lat: parseFloat(form.lat.value),
+      lng: parseFloat(form.lng.value),
+      address: form.address.value
+    },
+    skills,
+    availability,
+    experience: form.experience.value,
+    preferredCategories
+  };
+
+  try {
+    const data = await VS.post('/auth/register/volunteer', payload);
+    VS.setSession(data.token, data.role, data.user);
+    VS.toast('Account created! Redirecting...', 'success');
+    setTimeout(() => window.location.href = 'volunteer-dashboard.html', 800);
+  } catch (err) {
+    document.getElementById('alertBox').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Create Volunteer Account';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NGO Dashboard | VolunteerSkill</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg vs-navbar py-3">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="ngo-dashboard.html"><i class="fas fa-hands-helping me-2"></i>VolunteerSkill</a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span id="verifiedBadge"></span>
+      <div class="dropdown">
+        <button class="btn btn-light position-relative" data-bs-toggle="dropdown">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" class="notif-dot position-absolute top-0 end-0" style="display:none"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-0" style="width: 320px; max-height: 400px; overflow:auto;">
+          <div id="notifList"><div class="dropdown-item-text text-muted">Loading...</div></div>
+        </div>
+      </div>
+      <span class="fw-semibold" id="userNameTop"></span>
+      <button class="btn btn-sm btn-outline-danger" onclick="VS.logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 mt-4">
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Events</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statOpen">0</div><div class="stat-label">Open</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statProgress">0</div><div class="stat-label">In Progress</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statCompleted">0</div><div class="stat-label">Completed</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statMatched">0</div><div class="stat-label">Total Matched</div></div></div>
+    <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value" id="statAccepted">0</div><div class="stat-label">Accepted</div></div></div>
+  </div>
+
+  <div id="verifyBanner"></div>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#eventsTab">Events</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#microTab" onclick="loadMicroTasks()">Micro-Tasks</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#scanTab" onclick="loadScanTab()">Attendance Scanner</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#mapTab" onclick="loadVolunteerMap()">Volunteer Map</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#needMapTab" onclick="loadCommunityNeedMap()">Community Need Map</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#impactStatsTab" onclick="loadImpactStats()">Impact Statistics</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#verifyTab" onclick="loadVerificationDocs()">Verification</button></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="eventsTab">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title mb-0"><i class="fas fa-calendar-plus me-2"></i>Event Management</h4>
+        <button class="btn btn-vs-primary" onclick="editingEventId=null; document.getElementById('eventForm').reset(); document.getElementById('createEventBtn').innerHTML='<i class=&quot;fas fa-brain me-2&quot;></i>Create &amp; Run AI Matching'; document.querySelector('#createEventModal .modal-title').innerHTML='<i class=&quot;fas fa-calendar-plus me-2&quot;></i>Create New Event';" data-bs-toggle="modal" data-bs-target="#createEventModal"><i class="fas fa-plus me-1"></i>Create Event</button>
+      </div>
+      <div id="eventsList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="microTab">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title mb-0"><i class="fas fa-bolt me-2"></i>Micro-Tasks</h4>
+        <button class="btn btn-vs-primary" data-bs-toggle="modal" data-bs-target="#createMicroTaskModal"><i class="fas fa-plus me-1"></i>Create Micro-Task</button>
+      </div>
+      <div id="microTaskList"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="scanTab">
+      <h4 class="section-title mb-3"><i class="fas fa-qrcode me-2"></i>Scan Volunteer QR Code</h4>
+      <p class="text-muted small">Point the camera at a volunteer's check-in or check-out QR code. Each code can only be used once.</p>
+      <div class="card card-vs p-3" style="max-width:420px">
+        <div id="qrReader" style="width:100%;min-height:260px;background:#f4f6f5;border-radius:10px"></div>
+        <div id="scanStatus" class="small text-muted mt-2">Press "Start camera" and allow camera access when the browser asks.</div>
+        <div class="d-flex gap-2 mt-2 flex-wrap">
+          <button class="btn btn-sm btn-vs-primary" onclick="startScanner()"><i class="fas fa-camera me-1"></i>Start camera</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="stopScanner()">Stop</button>
+          <label class="btn btn-sm btn-outline-primary mb-0"><i class="fas fa-image me-1"></i>Scan from image<input type="file" accept="image/*" hidden onchange="scanQrFile(this)"></label>
+        </div>
+        <div id="scanResult" class="mt-3"></div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="mapTab">
+      <h4 class="section-title mb-3"><i class="fas fa-map-marked-alt me-2"></i>Volunteer Geographic Distribution</h4>
+      <p class="text-muted small">Volunteers who have not authorized exact location sharing are shown at an approximate area only.</p>
+      <div id="volMapWrap" style="height:400px;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,0.08);" class="mb-3 d-none"><div id="volMap" style="height:100%;width:100%;"></div></div>
+      <div id="volMapFallback" class="alert alert-light border small d-none"></div>
+      <div id="volMapList"></div>
+    </div>
+
+    <div class="tab-pane fade" id="needMapTab">
+      <h4 class="section-title mb-3"><i class="fas fa-fire me-2"></i>Community Need Map</h4>
+      <p class="text-muted small">Aggregated, privacy-safe view of unfilled volunteer requirements by area — never shows individual volunteer locations.</p>
+      <div class="d-flex gap-2 mb-3 flex-wrap">
+        <select class="form-select form-select-sm" style="width:auto" id="needCategoryFilter" onchange="loadCommunityNeedMap()">
+          <option value="all">All Categories</option><option>Healthcare</option><option>Education</option><option>Environment</option><option>Community Service</option><option>Digital</option>
+        </select>
+        <div class="form-check form-check-inline mt-1">
+          <input class="form-check-input" type="checkbox" id="needUrgentOnly" onchange="loadCommunityNeedMap()">
+          <label class="form-check-label small" for="needUrgentOnly">Urgent only</label>
+        </div>
+      </div>
+      <div id="needMapWrap" style="height:400px;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,0.08);" class="mb-3 d-none"><div id="needMap" style="height:100%;width:100%;"></div></div>
+      <div id="needMapFallback" class="alert alert-light border small d-none"></div>
+      <div id="needMapList"></div>
+    </div>
+
+    <div class="tab-pane fade" id="impactStatsTab">
+      <h4 class="section-title mb-3"><i class="fas fa-chart-pie me-2"></i>Impact Statistics</h4>
+      <div id="impactStatsWrap"><div class="spinner-wrap"><div class="spinner-border text-success"></div></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="verifyTab">
+      <h4 class="section-title mb-3"><i class="fas fa-file-shield me-2"></i>Verification Documents</h4>
+      <p class="text-muted small">Upload registration certificates or other proof of legitimacy for admin review.</p>
+      <div class="card card-vs p-3 mb-3">
+        <input type="file" class="form-control mb-2" id="docFile">
+        <button class="btn btn-vs-primary" onclick="uploadDoc()"><i class="fas fa-upload me-1"></i>Upload</button>
+      </div>
+      <div id="docList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Event Modal -->
+<div class="modal fade" id="createEventModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-calendar-plus me-2"></i>Create New Event</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="eventAlert"></div>
+        <form id="eventForm">
+          <div class="mb-3">
+            <label class="form-label">Event Title</label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="2"></textarea>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Category</label>
+              <select class="form-select" name="category" required>
+                <option>Education</option><option>Health</option><option>Environment</option>
+                <option>Disaster Relief</option><option>Animal Welfare</option><option>Elderly Care</option>
+                <option>Child Welfare</option><option>Community Development</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" name="date" required>
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Day of Week</label>
+              <select class="form-select" name="slotDay" required>
+                <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+                <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Time of Day</label>
+              <select class="form-select" name="slotTime" required>
+                <option>Morning</option><option>Afternoon</option><option>Evening</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Required Skills</label>
+            <div id="reqSkillsWrap" class="d-flex flex-wrap gap-2"></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Volunteers Needed</label>
+              <input type="number" class="form-control" name="volunteersNeeded" min="1" value="3" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Search Radius</label>
+              <select class="form-select" name="searchRadiusKm">
+                <option value="5">5 km</option><option value="10">10 km</option>
+                <option value="25">25 km</option><option value="50" selected>50 km</option><option value="100">100 km</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Event Location <span class="text-muted small">(leave blank to use your NGO's registered location)</span></label>
+            <input type="text" class="form-control" name="locationAddress" id="locationAutocomplete" placeholder="Start typing an address...">
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Budget (optional)</label>
+              <input type="number" class="form-control" name="budget" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Est. Hours per Volunteer</label>
+              <input type="number" class="form-control" name="estimatedHoursPerVolunteer" min="0.5" step="0.5" value="4">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Resource Requirements (optional)</label>
+            <input type="text" class="form-control" name="resourceRequirements" placeholder="e.g. Tents, first-aid kits, transport van">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Required Volunteer Roles (optional)</label>
+            <input type="text" class="form-control" name="requiredRoles" placeholder="Comma-separated, e.g. Team Lead, First Aider">
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Emergency Contact Name</label>
+              <input type="text" class="form-control" name="emergencyContactName" placeholder="Defaults to your NGO name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Emergency Contact Phone</label>
+              <input type="tel" class="form-control" name="emergencyContactPhone">
+            </div>
+          </div>
+          <div class="alert alert-light border small"><i class="fas fa-info-circle me-1"></i>AI matching runs automatically upon creation and re-runs whenever you edit key details.</div>
+          <button type="submit" class="btn btn-vs-primary w-100 py-2" id="createEventBtn"><i class="fas fa-brain me-2"></i>Create & Run AI Matching</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal fade" id="eventDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailTitle">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="cert-banner px-3 pt-3"></div>
+      <div class="modal-body" id="detailBody">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Give Feedback</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="feedbackForm">
+          <input type="hidden" id="fbEventId">
+          <input type="hidden" id="fbVolunteerId">
+          <p class="mb-2">Rating for <strong id="fbVolunteerName"></strong></p>
+          <div class="mb-3">
+            <select class="form-select" id="fbRating" required>
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Good</option>
+              <option value="3">3 - Average</option>
+              <option value="2">2 - Below Average</option>
+              <option value="1">1 - Poor</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <textarea class="form-control" id="fbComment" rows="2" placeholder="Comment (optional)"></textarea>
+          </div>
+          <button type="submit" class="btn btn-vs-primary w-100">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Appreciation Modal -->
+<div class="modal fade" id="appreciateModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Post Appreciation Message</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="appreciateForm">
+          <input type="hidden" id="apEventId"><input type="hidden" id="apVolunteerId">
+          <p class="mb-2">Thank <strong id="apVolunteerName"></strong> publicly:</p>
+          <textarea class="form-control mb-3" id="apMessage" rows="3" required placeholder="Thank you for your amazing effort at..."></textarea>
+          <button type="submit" class="btn btn-vs-primary w-100">Post to Appreciation Wall</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Impact Report Modal -->
+<div class="modal fade" id="impactReportModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-file-invoice me-2"></i>NGO Impact Report</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="impactReportBody">Loading...</div>
+      <div class="modal-footer">
+        <button class="btn btn-vs-outline" onclick="printImpactReport()"><i class="fas fa-print me-1"></i>Print</button>
+        <button class="btn btn-vs-primary" onclick="downloadImpactReportPdf()"><i class="fas fa-file-pdf me-1"></i>Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Micro-Task Modal -->
+<div class="modal fade" id="createMicroTaskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="fas fa-bolt me-2"></i>Create Micro-Task</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div id="microTaskAlert"></div>
+        <form id="microTaskForm">
+          <div class="mb-3"><label class="form-label">Task Title</label><input class="form-control" name="title" required></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="2" required></textarea></div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><label class="form-label">Required Skill</label><input class="form-control" name="requiredSkill" placeholder="e.g. Translation"></div>
+            <div class="col-md-6"><label class="form-label">Category</label>
+              <select class="form-select" name="category">
+                <option>Healthcare</option><option>Education</option><option>Environment</option>
+                <option selected>Community Development</option><option>Digital Literacy</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4"><label class="form-label">Estimated Duration</label>
+              <select class="form-select" name="estimatedMinutes">
+                <option value="10">10 minutes</option><option value="15">15 minutes</option>
+                <option value="20">20 minutes</option><option value="30" selected>30 minutes</option><option value="60">60 minutes</option>
+              </select>
+            </div>
+            <div class="col-md-4"><label class="form-label">Deadline</label><input type="date" class="form-control" name="deadline" required></div>
+            <div class="col-md-4"><label class="form-label">Mode</label>
+              <select class="form-select" name="mode" id="mtMode" onchange="document.getElementById('mtLocationWrap').classList.toggle('d-none', this.value==='online')">
+                <option value="online">Online</option><option value="offline">Offline</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 d-none" id="mtLocationWrap"><label class="form-label">Location Address</label><input class="form-control" name="locationAddress" id="mtLocationAutocomplete" placeholder="Start typing an address..."></div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><label class="form-label">Volunteers Needed</label><input type="number" class="form-control" name="volunteersNeeded" min="1" value="1"></div>
+            <div class="col-md-6"><label class="form-label">Difficulty</label>
+              <select class="form-select" name="difficulty"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+            </div>
+          </div>
+          <div class="mb-3"><label class="form-label">Instructions</label><textarea class="form-control" name="instructions" rows="2"></textarea></div>
+          <div class="mb-3"><label class="form-label">Submission Requirements</label><input class="form-control" name="submissionRequirements" placeholder="e.g. Link to a Google Doc"></div>
+          <button type="submit" class="btn btn-vs-primary w-100">Publish Micro-Task</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Micro-Task Submissions Modal -->
+<div class="modal fade" id="microTaskSubsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Submissions</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="cert-banner px-3 pt-3"></div>
+      <div class="modal-body" id="microTaskSubsBody">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+if (!VS.requireAuth(['ngo'])) { /* redirected */ }
+
+const SKILLS = ['Teaching','First Aid','Cooking','Event Management','Photography','Fundraising',
+  'Counseling','IT Support','Carpentry','Gardening','Driving','Translation','Social Media','Public Speaking','Healthcare'];
+const reqSkillsWrap = document.getElementById('reqSkillsWrap');
+SKILLS.forEach(s => {
+  reqSkillsWrap.innerHTML += `
+    <div class="form-check form-check-inline border rounded px-3 py-2">
+      <input class="form-check-input" type="checkbox" value="${s}" id="rsk_${s}">
+      <label class="form-check-label small" for="rsk_${s}">${s}</label>
+    </div>`;
+});
+
+async function loadProfile() {
+  const { user } = await VS.get('/profile');
+  document.getElementById('userNameTop').innerText = user.ngoName;
+  document.getElementById('verifiedBadge').innerHTML = user.verified
+    ? '<span class="badge badge-verified"><i class="fas fa-badge-check me-1"></i>Verified</span>'
+    : '<span class="badge badge-unverified"><i class="fas fa-clock me-1"></i>Pending Verification</span>';
+  document.getElementById('verifyBanner').innerHTML = user.verified ? '' : `
+    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+      <span><i class="fas fa-exclamation-triangle me-2"></i>Your NGO must be verified before you can publish events. Upload documents in the Verification tab.</span>
+    </div>`;
+  window._locationAutocompleteBase = user.location;
+}
+
+/* ---- Address autocomplete (falls back silently to plain text input if no Maps key) ---- */
+let selectedEventLocation = null;
+VS.attachAddressInput('locationAutocomplete', loc => { selectedEventLocation = loc; });
+
+async function loadStats() {
+  const s = await VS.get('/ngo/stats');
+  document.getElementById('statTotal').innerText = s.totalEvents;
+  document.getElementById('statOpen').innerText = s.openEvents;
+  document.getElementById('statProgress').innerText = s.inProgressEvents;
+  document.getElementById('statCompleted').innerText = s.completedEvents;
+  document.getElementById('statMatched').innerText = s.totalMatched;
+  document.getElementById('statAccepted').innerText = s.totalAccepted;
+}
+
+async function loadEvents() {
+  const wrap = document.getElementById('eventsList');
+  const { events } = await VS.get('/events');
+  if (!events.length) {
+    wrap.innerHTML = `<div class="alert alert-light border text-center py-5"><i class="fas fa-calendar fa-2x text-muted mb-3"></i><br>No events yet. Create your first event to trigger AI matching.</div>`;
+    return;
+  }
+  wrap.innerHTML = events.map(ev => {
+    const acceptedCount = ev.matchedVolunteers.filter(m => m.status === 'accepted').length;
+    const pendingCount = ev.matchedVolunteers.filter(m => m.status === 'pending').length;
+    return `
+    <div class="card card-vs mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${ev.title} <span class="badge bg-secondary">${ev.status}</span></h6>
+          <p class="small text-muted mb-1"><i class="fas fa-tag me-1"></i>${ev.category} &nbsp;|&nbsp; <i class="fas fa-calendar-day me-1"></i>${VS.fmtDate(ev.date)}</p>
+          <p class="small mb-1">${ev.description || ''}</p>
+          <div>
+            <span class="badge badge-match me-1"><i class="fas fa-users me-1"></i>${ev.volunteersNeeded} needed</span>
+            <span class="badge badge-pending me-1">${pendingCount} pending</span>
+            <span class="badge badge-accepted">${acceptedCount} accepted</span>
+          </div>
+        </div>
+        <div class="text-end mt-3 mt-md-0">
+          <button class="btn btn-sm btn-vs-primary mb-1" onclick="openDetail('${ev.id}')"><i class="fas fa-eye me-1"></i>View AI Matches</button>
+          <button class="btn btn-sm btn-vs-outline mb-1" onclick="editEvent('${ev.id}')" ${ev.status==='cancelled'||ev.status==='completed'?'disabled':''}><i class="fas fa-pen me-1"></i>Edit</button>
+          <button class="btn btn-sm btn-outline-danger mb-1" onclick="cancelEvent('${ev.id}')" ${ev.status==='cancelled'||ev.status==='completed'?'disabled':''}><i class="fas fa-ban me-1"></i>Cancel</button>
+          <button class="btn btn-sm btn-outline-secondary mb-1" onclick="openImpactReport('${ev.id}')"><i class="fas fa-file-invoice me-1"></i>Impact Report</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let editingEventId = null;
+document.getElementById('eventForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('createEventBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+  const form = e.target;
+  const requiredSkills = Array.from(document.querySelectorAll('#reqSkillsWrap input:checked')).map(el => el.value);
+
+  const payload = {
+    title: form.title.value,
+    description: form.description.value,
+    category: form.category.value,
+    date: form.date.value,
+    timeSlot: { day: form.slotDay.value, timeOfDay: form.slotTime.value },
+    requiredSkills,
+    volunteersNeeded: parseInt(form.volunteersNeeded.value, 10),
+    searchRadiusKm: parseFloat(form.searchRadiusKm.value),
+    budget: form.budget.value ? parseFloat(form.budget.value) : 0,
+    estimatedHoursPerVolunteer: form.estimatedHoursPerVolunteer.value ? parseFloat(form.estimatedHoursPerVolunteer.value) : 4,
+    resourceRequirements: form.resourceRequirements.value,
+    requiredRoles: form.requiredRoles.value ? form.requiredRoles.value.split(',').map(s => s.trim()).filter(Boolean) : [],
+    emergencyContact: { name: form.emergencyContactName.value, phone: form.emergencyContactPhone.value },
+    location: selectedEventLocation || undefined
+  };
+
+  try {
+    if (editingEventId) {
+      await VS.put(`/events/${editingEventId}`, payload);
+      VS.toast('Event updated. Matching re-ran if key details changed.', 'success');
+    } else {
+      const data = await VS.post('/events', payload);
+      VS.toast(`Event created! AI matched ${data.matchCount} volunteer(s).`, 'success');
+    }
+    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
+    form.reset();
+    selectedEventLocation = null;
+    editingEventId = null;
+    document.getElementById('createEventBtn').innerHTML = '<i class="fas fa-brain me-2"></i>Create & Run AI Matching';
+    document.querySelector('#createEventModal .modal-title').innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Create New Event';
+    loadEvents(); loadStats();
+  } catch (err) {
+    document.getElementById('eventAlert').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    if (!editingEventId) btn.innerHTML = '<i class="fas fa-brain me-2"></i>Create & Run AI Matching';
+  }
+});
+
+async function editEvent(eventId) {
+  const { event } = await VS.get(`/events/${eventId}`);
+  editingEventId = eventId;
+  const form = document.getElementById('eventForm');
+  form.title.value = event.title;
+  form.description.value = event.description || '';
+  form.category.value = event.category;
+  form.date.value = event.date;
+  form.slotDay.value = event.timeSlot?.day || 'Monday';
+  form.slotTime.value = event.timeSlot?.timeOfDay || 'Morning';
+  form.volunteersNeeded.value = event.volunteersNeeded;
+  form.searchRadiusKm.value = event.searchRadiusKm || 50;
+  form.budget.value = event.budget || '';
+  form.estimatedHoursPerVolunteer.value = event.estimatedHoursPerVolunteer || 4;
+  form.resourceRequirements.value = event.resourceRequirements || '';
+  form.requiredRoles.value = (event.requiredRoles || []).join(', ');
+  form.emergencyContactName.value = event.emergencyContact?.name || '';
+  form.emergencyContactPhone.value = event.emergencyContact?.phone || '';
+  document.querySelectorAll('#reqSkillsWrap input').forEach(el => { el.checked = (event.requiredSkills || []).includes(el.value); });
+  document.getElementById('createEventBtn').innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
+  document.querySelector('#createEventModal .modal-title').innerHTML = '<i class="fas fa-pen me-2"></i>Edit Event';
+  new bootstrap.Modal(document.getElementById('createEventModal')).show();
+}
+
+async function cancelEvent(eventId) {
+  const reason = prompt('Please provide a reason for cancelling this event (volunteers will be notified):');
+  if (!reason || !reason.trim()) return;
+  try {
+    await VS.post(`/events/${eventId}/cancel`, { reason });
+    VS.toast('Event cancelled', 'info');
+    loadEvents(); loadStats();
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+let currentDetailEventId = null;
+async function openDetail(eventId) {
+  currentDetailEventId = eventId;
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('eventDetailModal'));
+  document.getElementById('detailBody').innerHTML = '<div class="spinner-wrap"><div class="spinner-border text-success"></div></div>';
+  modal.show();
+  const { event } = await VS.get(`/events/${eventId}`);
+  document.getElementById('detailTitle').innerText = event.title + ' - AI Match Results';
+
+  const matchedRows = event.matchedVolunteers.map(m => `
+    <tr>
+      <td>${m.volunteer ? m.volunteer.name : 'Unknown'}</td>
+      <td><span class="match-score-pill pill-location">${m.distanceKm} km</span></td>
+      <td><span class="match-score-pill pill-availability">Avail: ${m.availabilityScore}</span></td>
+      <td><span class="match-score-pill pill-skill">Skill: ${m.skillScore}</span></td>
+      <td><span class="badge badge-${m.status}">${m.status}</span></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="text-muted text-center">No matches found within range.</td></tr>';
+
+  const assignedRows = event.assignedVolunteers.map(a => `
+    <tr>
+      <td>${a.volunteer ? a.volunteer.name : 'Unknown'}</td>
+      <td class="small">${a.checkInAt ? '<i class="fas fa-check text-success"></i> ' + new Date(a.checkInAt).toLocaleTimeString() : '<span class="text-muted">Not checked in</span>'}${a.checkOutAt ? '<br><i class="fas fa-check-double text-success"></i> ' + new Date(a.checkOutAt).toLocaleTimeString() : ''}</td>
+      <td>
+        <select class="form-select form-select-sm" style="width:140px" onchange="updateTaskStatus('${event.id}','${a.volunteerId}', this.value)">
+          <option value="assigned" ${a.status==='assigned'?'selected':''}>Assigned</option>
+          <option value="in-progress" ${a.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary mb-1" onclick="openFeedback('${event.id}','${a.volunteerId}','${a.volunteer ? a.volunteer.name.replace(/'/g,"\\'") : ''}')"><i class="fas fa-star"></i></button>
+        <button class="btn btn-sm btn-outline-success mb-1" onclick="genCertificate('${event.id}','${a.volunteerId}','${a.status}')" title="Generate / view certificate"><i class="fas fa-certificate"></i></button>
+        <button class="btn btn-sm btn-outline-warning mb-1" onclick="openAppreciate('${event.id}','${a.volunteerId}','${a.volunteer ? a.volunteer.name.replace(/'/g,"\\'") : ''}')"><i class="fas fa-heart"></i></button>
+        <button class="btn btn-sm btn-outline-secondary mb-1" onclick="correctAttendance('${event.id}','${a.volunteerId}')"><i class="fas fa-clock-rotate-left"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="text-muted text-center">No volunteers have accepted yet.</td></tr>';
+
+  document.getElementById('detailBody').innerHTML = `
+    <h6 class="fw-bold text-success"><i class="fas fa-brain me-2"></i>AI Matched Candidates (Location → Availability → Skill → Experience → Rating priority)</h6>
+    <div class="table-responsive mb-4">
+      <table class="table table-sm align-middle">
+        <thead><tr><th>Volunteer</th><th>Distance</th><th>Availability</th><th>Skill</th><th>Status</th></tr></thead>
+        <tbody>${matchedRows}</tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <h6 class="fw-bold text-primary mb-0"><i class="fas fa-tasks me-2"></i>Assigned Volunteers, Attendance & Actions</h6>
+      <a class="btn btn-sm btn-vs-outline" href="/api/events/${event.id}/attendance/export" target="_blank"><i class="fas fa-download me-1"></i>Export Attendance CSV</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead><tr><th>Volunteer</th><th>Attendance</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${assignedRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function openAppreciate(eventId, volunteerId, name) {
+  document.getElementById('apEventId').value = eventId;
+  document.getElementById('apVolunteerId').value = volunteerId;
+  document.getElementById('apVolunteerName').innerText = name;
+  new bootstrap.Modal(document.getElementById('appreciateModal')).show();
+}
+document.getElementById('appreciateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await VS.post(`/events/${document.getElementById('apEventId').value}/appreciate`, {
+      volunteerId: document.getElementById('apVolunteerId').value,
+      message: document.getElementById('apMessage').value
+    });
+    VS.toast('Appreciation posted!', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('appreciateModal')).hide();
+    e.target.reset();
+  } catch (err) { VS.toast(err.message, 'error'); }
+});
+
+async function correctAttendance(eventId, volunteerId) {
+  const checkInAt = prompt('New check-in time (ISO or leave blank to skip), e.g. 2026-09-22T09:00:00Z:');
+  const checkOutAt = prompt('New check-out time (ISO or leave blank to skip):');
+  const reason = prompt('Reason for this manual correction (required, kept in the audit log):');
+  if (!reason || !reason.trim()) { VS.toast('A reason is required', 'error'); return; }
+  try {
+    await VS.put(`/events/${eventId}/tasks/${volunteerId}/attendance/correct`, { checkInAt: checkInAt || undefined, checkOutAt: checkOutAt || undefined, reason });
+    VS.toast('Attendance corrected', 'success');
+    openDetail(eventId);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+async function updateTaskStatus(eventId, volunteerId, status) {
+  try {
+    await VS.put(`/events/${eventId}/tasks/${volunteerId}/status`, { status });
+    VS.toast('Task status updated', 'success');
+    openDetail(eventId);
+    loadEvents(); loadStats();
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+function openFeedback(eventId, volunteerId, name) {
+  document.getElementById('fbEventId').value = eventId;
+  document.getElementById('fbVolunteerId').value = volunteerId;
+  document.getElementById('fbVolunteerName').innerText = name;
+  new bootstrap.Modal(document.getElementById('feedbackModal')).show();
+}
+
+document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const eventId = document.getElementById('fbEventId').value;
+  const volunteerId = document.getElementById('fbVolunteerId').value;
+  try {
+    await VS.post(`/events/${eventId}/feedback`, {
+      volunteerId,
+      rating: parseInt(document.getElementById('fbRating').value, 10),
+      comment: document.getElementById('fbComment').value
+    });
+    VS.toast('Feedback submitted', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('feedbackModal')).hide();
+    e.target.reset();
+  } catch (err) { VS.toast(err.message, 'error'); }
+});
+
+function showCertLink(code, existed) {
+  const url = `certificate.html?code=${encodeURIComponent(code)}`;
+  const html = `<div class="alert alert-success d-flex flex-wrap align-items-center gap-2 mb-0">
+      <i class="fas fa-certificate text-warning"></i>
+      <span>Certificate ${existed ? 'already issued' : 'generated'} &mdash; code <b>${code}</b></span>
+      <a class="btn btn-sm btn-vs-primary ms-auto" target="_blank" rel="noopener" href="${url}"><i class="fas fa-eye me-1"></i>Open / Download Certificate</a>
+    </div>`;
+  document.querySelectorAll('.cert-banner').forEach(b => { b.innerHTML = html; });
+  VS.toast(`Certificate ${existed ? 'already issued' : 'generated'}: ${code}`, 'success');
+}
+
+async function genCertificate(eventId, volunteerId, status) {
+  try {
+    if (status !== 'completed') {
+      if (!confirm('This volunteer\'s task is not marked Completed yet. Mark it Completed and generate the certificate?')) return;
+      await VS.put(`/events/${eventId}/tasks/${volunteerId}/status`, { status: 'completed' });
+    }
+    const data = await VS.post(`/certificates/generate/${eventId}/${volunteerId}`);
+    showCertLink(data.certificate.code, data.alreadyExisted);
+    await openDetail(eventId); showCertLink(data.certificate.code, data.alreadyExisted); loadEvents(); loadStats();
+  } catch (err) { VS.toast(err.message || 'Certificate could not be generated', 'error'); console.error('Certificate error:', err); }
+}
+
+/* ---- Attendance QR Scanner ---- */
+let qrScanner = null, qrRunning = false, lastScan = { text: '', t: 0 };
+
+function setScanStatus(html, cls) {
+  const el = document.getElementById('scanStatus');
+  el.className = 'small mt-2 ' + (cls || 'text-muted');
+  el.innerHTML = html;
+}
+
+async function ensureQrLib() {
+  if (window.Html5Qrcode) return;
+  try { await VS.loadScript('https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'); }
+  catch (e) { await VS.loadScript('https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js'); }
+  if (!window.Html5Qrcode) throw new Error('QR scanner library could not be loaded. Check your internet connection.');
+}
+
+async function handleScan(text) {
+  const now = Date.now();
+  if (text === lastScan.text && now - lastScan.t < 4000) return;   // ignore the same code being read repeatedly
+  lastScan = { text, t: now };
+  try {
+    const data = await VS.post('/attendance/scan', { token: text });
+    document.getElementById('scanResult').innerHTML = `<div class="alert alert-success">${data.message} for ${data.volunteerName} at ${new Date(data.timestamp).toLocaleTimeString()}</div>`;
+  } catch (err) {
+    document.getElementById('scanResult').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function cameraErrorMessage(err) {
+  const name = (err && err.name) || '';
+  const msg = String((err && err.message) || err || '');
+  if (name === 'NotAllowedError' || /permission|denied/i.test(msg))
+    return 'Camera permission is blocked. Click the camera / lock icon in the address bar, choose <b>Allow</b>, then press <b>Start camera</b> again.';
+  if (name === 'NotFoundError' || /no camera|requested device not found/i.test(msg))
+    return 'No camera was found on this device. You can still use <b>Scan from image</b> with a screenshot or photo of the QR code.';
+  if (name === 'NotReadableError' || /could not start video|in use/i.test(msg))
+    return 'The camera is being used by another app or browser tab. Close it and press <b>Start camera</b> again.';
+  return 'Camera could not start: ' + msg;
+}
+
+async function startScanner() {
+  if (qrRunning) return;
+  if (!window.isSecureContext || !navigator.mediaDevices) {
+    setScanStatus('Browsers only allow camera access on <b>https://</b> or <b>http://localhost</b>. You opened this page at <code>' + location.origin + '</code>, so the camera is blocked. Open the site through localhost or HTTPS, or use <b>Scan from image</b>.', 'text-danger');
+    return;
+  }
+  try {
+    setScanStatus('Starting camera...');
+    await ensureQrLib();
+    if (!qrScanner) qrScanner = new Html5Qrcode('qrReader');
+    const cams = await Html5Qrcode.getCameras();           // this triggers the permission prompt
+    if (!cams || !cams.length) throw { name: 'NotFoundError' };
+    const back = cams.find(c => /back|rear|environment/i.test(c.label));
+    const camId = (back || cams[cams.length - 1]).id;      // laptops have one camera; phones use the rear one
+    await qrScanner.start(camId, { fps: 10, qrbox: { width: 220, height: 220 } }, handleScan, () => {});
+    qrRunning = true;
+    setScanStatus('<i class="fas fa-circle text-success me-1"></i>Camera is on. Hold the QR code inside the square.', 'text-success');
+  } catch (err) {
+    console.error('Scanner error:', err);
+    setScanStatus(cameraErrorMessage(err), 'text-danger');
+  }
+}
+
+async function stopScanner() {
+  if (qrScanner && qrRunning) { try { await qrScanner.stop(); } catch (e) { /* already stopped */ } }
+  qrRunning = false;
+  setScanStatus('Camera stopped.');
+}
+
+async function scanQrFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  try {
+    await ensureQrLib();
+    await stopScanner();
+    if (!qrScanner) qrScanner = new Html5Qrcode('qrReader');
+    const text = await qrScanner.scanFile(file, false);
+    await handleScan(text);
+  } catch (err) {
+    document.getElementById('scanResult').innerHTML = '<div class="alert alert-danger">No QR code could be read from that image. Use a clear, well-lit picture.</div>';
+  }
+  input.value = '';
+}
+
+// Start automatically when the tab opens (after it is visible), stop when leaving it
+function loadScanTab() { setTimeout(startScanner, 400); }
+document.querySelector('[data-bs-target="#scanTab"]').addEventListener('hidden.bs.tab', stopScanner);
+
+/* ---- Volunteer Map (approximate locations) ---- */
+async function loadVolunteerMap() {
+  const { volunteers } = await VS.get('/ngo/volunteer-map');
+  document.getElementById('volMapList').innerHTML = volunteers.length ? volunteers.map(v => `
+    <div class="card card-vs mb-2 p-2 px-3 d-flex flex-row justify-content-between align-items-center">
+      <span>${v.name}</span>
+      <span class="small text-muted">${v.exact ? 'Exact location shared' : 'Approximate area only'}</span>
+    </div>`).join('') : '<p class="text-muted small">No matched or assigned volunteers yet.</p>';
+
+  const { user } = await VS.get('/profile');
+  document.getElementById('volMapFallback').classList.add('d-none');
+  document.getElementById('volMapWrap').classList.remove('d-none');
+  await VS.showMap('volMap', user.location, volunteers.filter(v => v.location).map(v => ({
+    lat: v.location.lat, lng: v.location.lng, title: v.name + (v.exact ? '' : ' (approx.)')
+  })), 9);
+}
+
+/* ---- Community Need Map ---- */
+async function loadCommunityNeedMap() {
+  const category = document.getElementById('needCategoryFilter').value;
+  const urgentOnly = document.getElementById('needUrgentOnly').checked;
+  const { points } = await VS.get(`/community-need?category=${category}&urgentOnly=${urgentOnly}`);
+
+  const colorFor = level => level === 'High' ? '#e53935' : level === 'Medium' ? '#ffb300' : '#43a047';
+  document.getElementById('needMapList').innerHTML = points.length ? points.map(p => `
+    <div class="card card-vs mb-2 p-2 px-3 d-flex flex-row justify-content-between align-items-center">
+      <span><span class="badge" style="background:${colorFor(p.needLevel)}">${p.needLevel}</span> ${p.category} — ${p.unfilled} unfilled slot(s) ${p.urgent ? '<span class="text-danger small">(urgent)</span>' : ''}</span>
+    </div>`).join('') : '<p class="text-muted small">No unmet needs match this filter right now.</p>';
+
+  const { user } = await VS.get('/profile');
+  document.getElementById('needMapFallback').classList.add('d-none');
+  document.getElementById('needMapWrap').classList.remove('d-none');
+  await VS.showMap('needMap', user.location, points.map(p => ({
+    lat: p.lat, lng: p.lng, title: `${p.category}: ${p.needLevel} need (${p.unfilled} unfilled)`,
+    color: colorFor(p.needLevel), radius: 10 + Math.min(p.unfilled, 10)
+  })), 8);
+}
+
+/* ---- Impact Statistics ---- */
+async function loadImpactStats() {
+  const s = await VS.get('/ngo/impact-report');
+  document.getElementById('impactStatsWrap').innerHTML = `
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${s.eventsCompleted}</div><div class="stat-label">Events Completed</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${s.totalVolunteers}</div><div class="stat-label">Unique Volunteers</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${s.totalHours}</div><div class="stat-label">Total Hours</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">${Object.keys(s.byCategory).length}</div><div class="stat-label">Categories Served</div></div></div>
+    </div>
+    <h6 class="fw-bold mb-2">Top Skills Contributed</h6>
+    <div class="mb-4">${s.topSkillsContributed.map(x => `<span class="skill-chip">${x.skill} (${x.count})</span>`).join('') || '<span class="text-muted small">No data yet</span>'}</div>
+    <h6 class="fw-bold mb-2">Events by Category</h6>
+    <div>${Object.entries(s.byCategory).map(([c, n]) => `<span class="badge bg-secondary me-1 mb-1">${c}: ${n}</span>`).join('') || '<span class="text-muted small">No data yet</span>'}</div>
+  `;
+}
+
+/* ---- Verification Docs ---- */
+async function loadVerificationDocs() {
+  const { documents, status } = await VS.get('/ngo/verification-docs');
+  document.getElementById('docList').innerHTML = `
+    <p class="mb-2">Status: <span class="badge ${status === 'approved' ? 'badge-verified' : status === 'rejected' ? 'bg-danger' : 'badge-unverified'}">${status}</span></p>
+    ${documents.length ? documents.map(d => `<div class="card card-vs p-2 px-3 mb-2 d-flex flex-row justify-content-between"><span><i class="fas fa-file me-2"></i>${d.filename}</span><span class="small text-muted">${VS.fmtDate(d.uploadedAt)}</span></div>`).join('') : '<p class="text-muted small">No documents uploaded yet.</p>'}
+  `;
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadDoc() {
+  const input = document.getElementById('docFile');
+  if (!input.files.length) return VS.toast('Choose a file first', 'error');
+  try {
+    const base64 = await fileToBase64(input.files[0]);
+    await VS.post('/ngo/verification-docs', { filename: input.files[0].name, base64 });
+    VS.toast('Document uploaded for review', 'success');
+    input.value = '';
+    loadVerificationDocs();
+  } catch (err) { VS.toast(err.message || 'Upload failed', 'error'); }
+}
+
+/* ---- Micro-Tasks ---- */
+VS.attachAddressInput('mtLocationAutocomplete', loc => { window._mtLocation = loc; });
+
+async function loadMicroTasks() {
+  const { tasks } = await VS.get('/micro-tasks');
+  document.getElementById('microTaskList').innerHTML = tasks.length ? tasks.map(t => `
+    <div class="card card-vs mb-3 p-3">
+      <div class="d-flex justify-content-between flex-wrap">
+        <div>
+          <h6 class="fw-bold mb-1">${t.title} <span class="badge bg-secondary">${t.status}</span> <span class="badge bg-info text-dark">${t.mode}</span></h6>
+          <p class="small mb-1">${t.description}</p>
+          <p class="small text-muted mb-0">${t.estimatedMinutes} min · ${t.requiredSkill || 'Any skill'} · Deadline ${VS.fmtDate(t.deadline)} · ${t.assignedVolunteers.length}/${t.volunteersNeeded} claimed</p>
+        </div>
+        <div class="text-end mt-2 mt-md-0">
+          <button class="btn btn-sm btn-vs-primary mb-1" onclick="openMicroTaskSubs('${t.id}')"><i class="fas fa-inbox me-1"></i>Submissions</button>
+          <button class="btn btn-sm btn-outline-danger mb-1" onclick="cancelMicroTask('${t.id}')" ${t.status==='closed'?'disabled':''}>Close</button>
+        </div>
+      </div>
+    </div>`).join('') : '<div class="alert alert-light border text-center py-4">No micro-tasks yet.</div>';
+}
+async function cancelMicroTask(id) {
+  try { await VS.post(`/micro-tasks/${id}/cancel`); VS.toast('Micro-task closed', 'info'); loadMicroTasks(); }
+  catch (err) { VS.toast(err.message, 'error'); }
+}
+document.getElementById('microTaskForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const payload = {
+    title: form.title.value, description: form.description.value, requiredSkill: form.requiredSkill.value,
+    category: form.category.value, estimatedMinutes: parseInt(form.estimatedMinutes.value, 10),
+    deadline: form.deadline.value, mode: form.mode.value,
+    location: form.mode.value === 'offline' ? (window._mtLocation || null) : undefined,
+    volunteersNeeded: parseInt(form.volunteersNeeded.value, 10), difficulty: form.difficulty.value,
+    instructions: form.instructions.value, submissionRequirements: form.submissionRequirements.value
+  };
+  if (payload.mode === 'offline' && !payload.location) {
+    document.getElementById('microTaskAlert').innerHTML = '<div class="alert alert-danger">Please select a location for offline tasks using the address field.</div>';
+    return;
+  }
+  try {
+    await VS.post('/micro-tasks', payload);
+    VS.toast('Micro-task published', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('createMicroTaskModal')).hide();
+    form.reset();
+    window._mtLocation = null;
+    loadMicroTasks();
+  } catch (err) {
+    document.getElementById('microTaskAlert').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+});
+async function openMicroTaskSubs(taskId) {
+  const modal = new bootstrap.Modal(document.getElementById('microTaskSubsModal'));
+  document.getElementById('microTaskSubsBody').innerHTML = '<div class="spinner-wrap"><div class="spinner-border text-success"></div></div>';
+  modal.show();
+  const { submissions } = await VS.get(`/micro-tasks/${taskId}/submissions`);
+  document.getElementById('microTaskSubsBody').innerHTML = submissions.length ? submissions.map(s => `
+    <div class="card card-vs p-3 mb-2">
+      <p class="fw-bold mb-1">${s.volunteerName} <span class="badge ${s.status==='approved'?'badge-accepted':s.status==='rejected'?'badge-rejected':'badge-pending'}">${s.status}</span></p>
+      <p class="small mb-1">${s.submissionText || ''} ${s.submissionUrl ? `<a href="${s.submissionUrl}" target="_blank">${s.submissionUrl}</a>` : ''}</p>
+      <p class="small text-muted mb-2">Submitted ${VS.fmtDate(s.submittedAt)}</p>
+      ${s.status === 'submitted' ? `
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-vs-primary" onclick="reviewSubmission('${taskId}','${s.id}','approved')">Approve</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="reviewSubmission('${taskId}','${s.id}','rejected')">Reject</button>
+        </div>` : `<button class="btn btn-sm btn-outline-success" onclick="issueMicroCert('${taskId}','${s.id}')" ${s.status!=='approved'?'disabled':''}>Issue Certificate</button>`}
+    </div>`).join('') : '<p class="text-muted small">No submissions yet.</p>';
+}
+async function reviewSubmission(taskId, subId, decision) {
+  const note = decision === 'rejected' ? prompt('Optional note for the volunteer:') : '';
+  try {
+    await VS.put(`/micro-tasks/${taskId}/submissions/${subId}/review`, { decision, note: note || '' });
+    VS.toast(`Submission ${decision}`, 'success');
+    openMicroTaskSubs(taskId);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+async function issueMicroCert(taskId, subId) {
+  try {
+    const data = await VS.post(`/micro-tasks/${taskId}/submissions/${subId}/certificate`);
+    showCertLink(data.certificate.code, data.alreadyExisted);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+
+/* ---- NGO Impact Report (view / edit / print / PDF) ---- */
+let currentReportEventId = null;
+async function openImpactReport(eventId) {
+  currentReportEventId = eventId;
+  const modal = new bootstrap.Modal(document.getElementById('impactReportModal'));
+  document.getElementById('impactReportBody').innerHTML = '<div class="spinner-wrap"><div class="spinner-border text-success"></div></div>';
+  modal.show();
+  const { report } = await VS.get(`/events/${eventId}/impact-report`);
+  renderImpactReport(report);
+}
+function renderImpactReport(r) {
+  document.getElementById('impactReportBody').innerHTML = `
+    <div id="reportPrintArea">
+      <h4 class="fw-bold">${r.eventOverview.title}</h4>
+      <p class="text-muted small mb-3">${r.eventOverview.category} · ${VS.fmtDate(r.eventOverview.date)} · Status: ${r.eventOverview.status}</p>
+      <div class="row g-3 mb-3">
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.volunteerParticipation.registered}</div><div class="stat-label">Registered</div></div></div>
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.volunteerParticipation.confirmed}</div><div class="stat-label">Confirmed</div></div></div>
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.volunteerParticipation.attended}</div><div class="stat-label">Attended</div></div></div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.volunteerHours}</div><div class="stat-label">Hours</div></div></div>
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.tasksCompleted}</div><div class="stat-label">Tasks Done</div></div></div>
+        <div class="col-4"><div class="stat-card"><div class="stat-value">${r.feedbackSummary.averageRating ?? '—'}</div><div class="stat-label">Avg Rating</div></div></div>
+      </div>
+      <h6 class="fw-bold">Skills Contributed</h6>
+      <p class="mb-3">${r.skillsContributed.map(s=>`<span class="skill-chip">${s}</span>`).join('') || '<span class="text-muted small">None listed</span>'}</p>
+      <h6 class="fw-bold">Attendance Summary</h6>
+      <table class="table table-sm mb-3"><thead><tr><th>Volunteer</th><th>Checked In</th><th>Checked Out</th><th>Status</th></tr></thead>
+        <tbody>${r.attendanceSummary.map(a=>`<tr><td>${a.name}</td><td>${a.checkedIn?'Yes':'No'}</td><td>${a.checkedOut?'Yes':'No'}</td><td>${a.status}</td></tr>`).join('') || '<tr><td colspan="4" class="text-muted text-center">No attendance yet</td></tr>'}</tbody></table>
+      <h6 class="fw-bold">Feedback Comments</h6>
+      <ul class="mb-3">${r.feedbackSummary.comments.map(c=>`<li class="small">${c}</li>`).join('') || '<li class="small text-muted">No comments yet</li>'}</ul>
+      <h6 class="fw-bold">Community Impact ${r.verified ? '<span class="badge badge-verified ms-1">Verified</span>' : '<span class="badge badge-unverified ms-1">Unverified</span>'}</h6>
+      <div class="row g-2 mb-2 no-print">
+        <div class="col-md-4"><label class="small">Beneficiaries reached</label><input class="form-control form-control-sm" id="ciBeneficiaries" type="number" value="${r.communityImpact.beneficiaries ?? ''}"></div>
+        <div class="col-md-4"><label class="small">Environmental impact</label><input class="form-control form-control-sm" id="ciEnv" value="${r.communityImpact.environmentalImpact || ''}"></div>
+        <div class="col-md-4"><label class="small">Notes</label><input class="form-control form-control-sm" id="ciNotes" value="${r.communityImpact.communityImpactNotes || ''}"></div>
+      </div>
+      <div class="print-only mb-2 small">Beneficiaries: ${r.communityImpact.beneficiaries ?? '—'} · Environmental impact: ${r.communityImpact.environmentalImpact || '—'} · Notes: ${r.communityImpact.communityImpactNotes || '—'}</div>
+      <div class="form-check mb-3 no-print">
+        <input class="form-check-input" type="checkbox" id="ciVerified" ${r.verified ? 'checked' : ''}>
+        <label class="form-check-label small" for="ciVerified">I verify this impact information is accurate</label>
+      </div>
+      <button class="btn btn-sm btn-vs-primary no-print" onclick="saveImpactReportFields()"><i class="fas fa-save me-1"></i>Save Impact Info</button>
+      <h6 class="fw-bold mt-4">Final Impact Summary</h6>
+      <p>This event mobilized ${r.volunteerParticipation.attended} volunteer(s) contributing ${r.volunteerHours} hour(s) across ${r.skillsContributed.length || 0} skill area(s)${r.communityImpact.beneficiaries ? `, reaching approximately ${r.communityImpact.beneficiaries} beneficiaries` : ''}.</p>
+    </div>`;
+}
+async function saveImpactReportFields() {
+  try {
+    await VS.put(`/events/${currentReportEventId}/impact-report`, {
+      beneficiaries: document.getElementById('ciBeneficiaries').value,
+      environmentalImpact: document.getElementById('ciEnv').value,
+      communityImpactNotes: document.getElementById('ciNotes').value,
+      verified: document.getElementById('ciVerified').checked
+    });
+    VS.toast('Impact information saved', 'success');
+    openImpactReport(currentReportEventId);
+  } catch (err) { VS.toast(err.message, 'error'); }
+}
+function printImpactReport() {
+  const printContents = document.getElementById('reportPrintArea').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>Impact Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>.no-print{display:none} body{padding:30px}</style></head><body>${printContents}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+async function downloadImpactReportPdf() {
+  await VS.loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+  await VS.loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+  const area = document.getElementById('reportPrintArea');
+  const canvas = await html2canvas(area, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const imgHeight = (canvas.height * pageWidth) / canvas.width;
+  pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+  pdf.save('volunteerskill-impact-report.pdf');
+}
+
+loadProfile();
+loadStats();
+loadEvents();
+loadNotifications('notifBadge', 'notifList');
+setInterval(() => { loadStats(); loadEvents(); loadNotifications('notifBadge', 'notifList'); }, 15000);
+</script>
+</body>
+</html>

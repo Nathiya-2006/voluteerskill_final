@@ -1,0 +1,566 @@
+{
+  "volunteers": [
+    {
+      "id": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "name": "Nathiya",
+      "email": "nathiya@example.com",
+      "phone": "9345852875",
+      "passwordHash": "$2a$08$dw5qr9i60j8dIzZxRHLFQOCwfpIJygqUqOOZvXE/FxksJbOlXG/ja",
+      "role": "volunteer",
+      "location": {
+        "lat": 11.0959,
+        "lng": 77.3674,
+        "address": "Tirunelveli"
+      },
+      "skills": [
+        "Teaching",
+        "First Aid",
+        "Cooking",
+        "IT Support",
+        "Gardening",
+        "Social Media",
+        "Public Speaking",
+        "Healthcare"
+      ],
+      "availability": [
+        {
+          "day": "Monday",
+          "timeOfDay": "Morning"
+        },
+        {
+          "day": "Tuesday",
+          "timeOfDay": "Morning"
+        },
+        {
+          "day": "Wednesday",
+          "timeOfDay": "Morning"
+        }
+      ],
+      "experience": "No Experience",
+      "preferredCategories": [
+        "Education",
+        "Health",
+        "Environment",
+        "Community Development"
+      ],
+      "rating": 5,
+      "ratingCount": 2,
+      "completedEvents": [
+        "4a5d8ea8-720f-410c-b1c8-d209569876be",
+        "6fe6d2a4-7450-4923-90cf-ba6145b07315"
+      ],
+      "certificates": [
+        "01f57ba8-4153-48ba-b52d-7d178635db9c",
+        "e4eedbd0-438b-4d8e-96c6-c72cb5a780f0"
+      ],
+      "hoursCompleted": 8,
+      "skillsUsedHistory": [
+        "Teaching",
+        "Cooking",
+        "IT Support",
+        "Gardening",
+        "Social Media",
+        "Public Speaking",
+        "Healthcare"
+      ],
+      "badges": [
+        {
+          "id": "first_event",
+          "label": "First Steps",
+          "description": "Completed your first volunteering event.",
+          "icon": "fa-seedling",
+          "earnedAt": "2026-10-05T09:45:58.183Z"
+        },
+        {
+          "id": "multi_skill",
+          "label": "Versatile Volunteer",
+          "description": "Used 3+ different skills across events.",
+          "icon": "fa-toolbox",
+          "earnedAt": "2026-10-05T09:45:58.184Z"
+        }
+      ],
+      "milestones": [
+        {
+          "id": "3a03b658-4730-4462-a8df-bab4cc44faab",
+          "type": "badge",
+          "label": "Earned badge: First Steps",
+          "date": "2026-10-05T09:45:58.183Z"
+        },
+        {
+          "id": "19dee1e7-72e2-4f00-8d86-d4eef332844d",
+          "type": "badge",
+          "label": "Earned badge: Versatile Volunteer",
+          "date": "2026-10-05T09:45:58.184Z"
+        },
+        {
+          "id": "c1a82500-5159-4c00-b782-b70eee63228e",
+          "type": "event_completed",
+          "label": "Completed \"Planting the Trees\"",
+          "date": "2026-10-05T09:45:58.184Z",
+          "month": "2026-10"
+        },
+        {
+          "id": "554453c5-3c25-4e62-b21c-32ee41d9ba01",
+          "type": "event_completed",
+          "label": "Completed \"blood Donation\"",
+          "date": "2026-10-05T11:15:06.410Z",
+          "month": "2026-10"
+        }
+      ],
+      "leaderboardOptIn": true,
+      "notifPrefs": {
+        "opportunity": true,
+        "application": true,
+        "replacement": true,
+        "reminder": true,
+        "scheduleChange": true,
+        "attendance": true,
+        "certificate": true,
+        "feedback": true,
+        "badge": true,
+        "general": true
+      },
+      "privacy": {
+        "profileVisibility": "public",
+        "shareExactLocationWithNgos": false
+      },
+      "createdAt": "2026-10-05T09:39:54.046Z"
+    }
+  ],
+  "ngos": [
+    {
+      "id": "32535a56-341a-4260-8abd-53774b84c102",
+      "ngoName": "environmental",
+      "registrationNumber": "NGO12345",
+      "address": "Tirunelveli",
+      "location": {
+        "lat": 11.0959,
+        "lng": 77.3674
+      },
+      "description": "",
+      "email": "environmental@gmail.com",
+      "passwordHash": "$2a$08$Z9qk0rfuRwr40WWQ330BJutoERCS/ydCRbmDPV1wwCeyWwArVrKxa",
+      "role": "ngo",
+      "verified": true,
+      "verificationStatus": "approved",
+      "verificationDocs": [],
+      "notifPrefs": {
+        "opportunity": true,
+        "application": true,
+        "replacement": true,
+        "reminder": true,
+        "scheduleChange": true,
+        "attendance": true,
+        "certificate": true,
+        "feedback": true,
+        "badge": true,
+        "general": true
+      },
+      "createdAt": "2026-10-05T09:38:26.969Z"
+    }
+  ],
+  "admins": [
+    {
+      "id": "08bcf9d2-03b1-4b93-a622-f03e9400b3ec",
+      "email": "admin@volunteerskill.org",
+      "passwordHash": "$2a$08$eOqJrDZVHt4TocKcEv8c.O6vnHeotvZQYIURXaB6yM4SyjMZj8i2q",
+      "role": "admin",
+      "name": "Platform Admin"
+    }
+  ],
+  "events": [
+    {
+      "id": "4a5d8ea8-720f-410c-b1c8-d209569876be",
+      "ngoId": "32535a56-341a-4260-8abd-53774b84c102",
+      "title": "Planting the Trees",
+      "description": "planting trees for created a green environment",
+      "category": "Environment",
+      "location": {
+        "lat": 11.0959,
+        "lng": 77.3674
+      },
+      "date": "2026-10-05",
+      "timeSlot": {
+        "day": "Monday",
+        "timeOfDay": "Morning"
+      },
+      "requiredSkills": [
+        "Teaching",
+        "Cooking",
+        "IT Support",
+        "Gardening",
+        "Social Media",
+        "Public Speaking"
+      ],
+      "volunteersNeeded": 1,
+      "searchRadiusKm": 50,
+      "budget": 0,
+      "resourceRequirements": "",
+      "requiredRoles": [],
+      "emergencyContact": {
+        "name": "environmental",
+        "phone": ""
+      },
+      "estimatedHoursPerVolunteer": 4,
+      "status": "completed",
+      "matchedVolunteers": [
+        {
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "status": "accepted",
+          "distanceKm": 0,
+          "availabilityScore": 2,
+          "skillScore": 6,
+          "experienceScore": 1,
+          "rating": 0,
+          "matchedAt": "2026-10-05T09:43:51.374Z",
+          "respondedAt": "2026-10-05T09:44:13.291Z"
+        }
+      ],
+      "assignedVolunteers": [
+        {
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "status": "completed",
+          "assignedAt": "2026-10-05T09:44:13.291Z",
+          "checkInAt": "2026-10-05T09:45:12.060Z",
+          "checkOutAt": null,
+          "manualCorrections": [],
+          "updatedAt": "2026-10-05T09:45:58.182Z"
+        }
+      ],
+      "candidatePool": [],
+      "feedback": [
+        {
+          "id": "a0c0fe4c-7a71-48ca-a7af-f42e938d528f",
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "rating": 5,
+          "comment": "Excellent Volunteering",
+          "createdAt": "2026-10-05T09:46:15.692Z"
+        }
+      ],
+      "cancelledAt": null,
+      "cancelReason": null,
+      "createdAt": "2026-10-05T09:43:51.373Z"
+    },
+    {
+      "id": "6fe6d2a4-7450-4923-90cf-ba6145b07315",
+      "ngoId": "32535a56-341a-4260-8abd-53774b84c102",
+      "title": "blood Donation",
+      "description": "give the blood to save the life of many people",
+      "category": "Health",
+      "location": {
+        "lat": 11.0959,
+        "lng": 77.3674
+      },
+      "date": "2026-10-05",
+      "timeSlot": {
+        "day": "Monday",
+        "timeOfDay": "Morning"
+      },
+      "requiredSkills": [
+        "Healthcare"
+      ],
+      "volunteersNeeded": 1,
+      "searchRadiusKm": 50,
+      "budget": 0,
+      "resourceRequirements": "",
+      "requiredRoles": [],
+      "emergencyContact": {
+        "name": "environmental",
+        "phone": ""
+      },
+      "estimatedHoursPerVolunteer": 4,
+      "status": "completed",
+      "matchedVolunteers": [
+        {
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "status": "accepted",
+          "distanceKm": 0,
+          "availabilityScore": 2,
+          "skillScore": 1,
+          "experienceScore": 1,
+          "rating": 5,
+          "matchedAt": "2026-10-05T11:13:20.249Z",
+          "respondedAt": "2026-10-05T11:13:37.357Z"
+        }
+      ],
+      "assignedVolunteers": [
+        {
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "status": "completed",
+          "assignedAt": "2026-10-05T11:13:37.357Z",
+          "checkInAt": "2026-10-05T11:14:48.561Z",
+          "checkOutAt": null,
+          "manualCorrections": [],
+          "updatedAt": "2026-10-05T11:15:06.409Z"
+        }
+      ],
+      "candidatePool": [],
+      "feedback": [
+        {
+          "id": "b567454d-ca23-4b4b-8116-4f1df97a7c56",
+          "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+          "rating": 5,
+          "comment": "excellent",
+          "createdAt": "2026-10-05T11:15:15.748Z"
+        }
+      ],
+      "cancelledAt": null,
+      "cancelReason": null,
+      "createdAt": "2026-10-05T11:13:20.246Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "f9030b69-60c2-492f-9808-efa0199be0b5",
+      "userId": "32535a56-341a-4260-8abd-53774b84c102",
+      "role": "ngo",
+      "title": "Registration Received",
+      "message": "Your NGO account was created and is pending admin verification. Upload verification documents from your dashboard to speed up approval.",
+      "category": "verification",
+      "read": false,
+      "createdAt": "2026-10-05T09:38:26.979Z"
+    },
+    {
+      "id": "42604bb4-97ab-4721-8d63-0565f4ac3429",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Welcome to VolunteerSkill!",
+      "message": "Your profile is live. We will start matching you with nearby opportunities.",
+      "category": "general",
+      "read": false,
+      "createdAt": "2026-10-05T09:39:54.047Z"
+    },
+    {
+      "id": "953ee847-872a-4989-9bca-6410fbcd0a95",
+      "userId": "32535a56-341a-4260-8abd-53774b84c102",
+      "role": "ngo",
+      "title": "NGO Verified!",
+      "message": "Your NGO has been verified by the admin. You can now publish events, and volunteers will see your Verified badge.",
+      "category": "verification",
+      "read": false,
+      "createdAt": "2026-10-05T09:42:27.663Z"
+    },
+    {
+      "id": "dcf74c00-fd58-4db1-8555-f7c86a9771ad",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Opportunity Matched!",
+      "message": "You've been matched to \"Planting the Trees\" based on your location, availability, and skills. Please review and respond.",
+      "category": "opportunity",
+      "read": false,
+      "createdAt": "2026-10-05T09:43:51.374Z"
+    },
+    {
+      "id": "a1d61423-1ce6-40db-9909-9967ee31f5a2",
+      "userId": "32535a56-341a-4260-8abd-53774b84c102",
+      "role": "ngo",
+      "title": "Volunteer Accepted",
+      "message": "Nathiya accepted the opportunity \"Planting the Trees\".",
+      "category": "application",
+      "read": false,
+      "createdAt": "2026-10-05T09:44:13.291Z"
+    },
+    {
+      "id": "f17d155e-5086-4316-babc-b9f6ae96f600",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Checked In",
+      "message": "You were checked in to \"Planting the Trees\" at 3:15:12 pm.",
+      "category": "attendance",
+      "read": false,
+      "createdAt": "2026-10-05T09:45:12.107Z"
+    },
+    {
+      "id": "76389a70-894f-44b4-bd18-146a80a6d788",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Badge Earned!",
+      "message": "Congratulations! You've earned the \"First Steps\" badge.",
+      "category": "badge",
+      "read": false,
+      "createdAt": "2026-10-05T09:45:58.183Z"
+    },
+    {
+      "id": "9a6762f0-7d3a-43a7-abdd-336f51bd8fe6",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Badge Earned!",
+      "message": "Congratulations! You've earned the \"Versatile Volunteer\" badge.",
+      "category": "badge",
+      "read": false,
+      "createdAt": "2026-10-05T09:45:58.184Z"
+    },
+    {
+      "id": "03cac732-9f12-455d-88b6-a048df2996b9",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Task Completed",
+      "message": "Your task for \"Planting the Trees\" has been marked completed. Feedback and certificate coming soon!",
+      "category": "application",
+      "read": false,
+      "createdAt": "2026-10-05T09:45:58.184Z"
+    },
+    {
+      "id": "617f3b0e-4080-4ea7-bc2a-ff60645cde9e",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Feedback Received",
+      "message": "You received a 5-star rating for \"Planting the Trees\".",
+      "category": "feedback",
+      "read": false,
+      "createdAt": "2026-10-05T09:46:15.692Z"
+    },
+    {
+      "id": "4c48c1d5-fded-477c-a260-1c482a4f45fd",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Opportunity Matched!",
+      "message": "You've been matched to \"blood Donation\" based on your location, availability, and skills. Please review and respond.",
+      "category": "opportunity",
+      "read": false,
+      "createdAt": "2026-10-05T11:13:20.250Z"
+    },
+    {
+      "id": "df69a55f-3060-4763-9c2b-779d3d006ac5",
+      "userId": "32535a56-341a-4260-8abd-53774b84c102",
+      "role": "ngo",
+      "title": "Volunteer Accepted",
+      "message": "Nathiya accepted the opportunity \"blood Donation\".",
+      "category": "application",
+      "read": false,
+      "createdAt": "2026-10-05T11:13:37.357Z"
+    },
+    {
+      "id": "4437d674-69d3-47e9-98e0-f39680f46c4d",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Checked In",
+      "message": "You were checked in to \"blood Donation\" at 4:44:48 pm.",
+      "category": "attendance",
+      "read": false,
+      "createdAt": "2026-10-05T11:14:48.635Z"
+    },
+    {
+      "id": "75fe6684-bc82-4550-81f5-8c915a7ad627",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Task Completed",
+      "message": "Your task for \"blood Donation\" has been marked completed. Feedback and certificate coming soon!",
+      "category": "application",
+      "read": false,
+      "createdAt": "2026-10-05T11:15:06.410Z"
+    },
+    {
+      "id": "864d08b2-20e7-4571-96b2-c46564efd0cc",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "New Feedback Received",
+      "message": "You received a 5-star rating for \"blood Donation\".",
+      "category": "feedback",
+      "read": false,
+      "createdAt": "2026-10-05T11:15:15.749Z"
+    },
+    {
+      "id": "d8733f82-62ae-4468-a7fc-fa9f722e8669",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Certificate Issued!",
+      "message": "Your certificate for \"Planting the Trees\" is ready. Verification code: VS-AC4FC6-MUV5UIBI",
+      "category": "certificate",
+      "read": false,
+      "createdAt": "2026-10-05T11:22:33.151Z"
+    },
+    {
+      "id": "137dca72-2ced-4dfe-bf73-7374b0aae5b7",
+      "userId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "role": "volunteer",
+      "title": "Certificate Issued!",
+      "message": "Your certificate for \"blood Donation\" is ready. Verification code: VS-BDE44D-MUV5UIBJ",
+      "category": "certificate",
+      "read": false,
+      "createdAt": "2026-10-05T11:22:33.151Z"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "01f57ba8-4153-48ba-b52d-7d178635db9c",
+      "code": "VS-AC4FC6-MUV5UIBI",
+      "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "volunteerName": "Nathiya",
+      "eventId": "4a5d8ea8-720f-410c-b1c8-d209569876be",
+      "eventTitle": "Planting the Trees",
+      "ngoName": "environmental",
+      "issuedAt": "2026-10-05T11:22:33.150Z",
+      "hours": 4
+    },
+    {
+      "id": "e4eedbd0-438b-4d8e-96c6-c72cb5a780f0",
+      "code": "VS-BDE44D-MUV5UIBJ",
+      "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "volunteerName": "Nathiya",
+      "eventId": "6fe6d2a4-7450-4923-90cf-ba6145b07315",
+      "eventTitle": "blood Donation",
+      "ngoName": "environmental",
+      "issuedAt": "2026-10-05T11:22:33.151Z",
+      "hours": 4
+    }
+  ],
+  "reports": [],
+  "auditLogs": [
+    {
+      "id": "74d71d77-6e53-4abf-ae9a-7dedb622b30c",
+      "actorId": "08bcf9d2-03b1-4b93-a622-f03e9400b3ec",
+      "actorRole": "admin",
+      "action": "verify_ngo",
+      "targetType": "ngo",
+      "targetId": "32535a56-341a-4260-8abd-53774b84c102",
+      "details": "",
+      "createdAt": "2026-10-05T09:42:27.664Z"
+    },
+    {
+      "id": "3d5d1745-a000-4fcd-8e14-5448f02e9380",
+      "actorId": "32535a56-341a-4260-8abd-53774b84c102",
+      "actorRole": "ngo",
+      "action": "qr_checkin",
+      "targetType": "assignment",
+      "targetId": "4a5d8ea8-720f-410c-b1c8-d209569876be:f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "details": "",
+      "createdAt": "2026-10-05T09:45:12.107Z"
+    },
+    {
+      "id": "507aa501-d08f-4fae-879c-ece4d800c8ef",
+      "actorId": "32535a56-341a-4260-8abd-53774b84c102",
+      "actorRole": "ngo",
+      "action": "qr_checkin",
+      "targetType": "assignment",
+      "targetId": "6fe6d2a4-7450-4923-90cf-ba6145b07315:f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "details": "",
+      "createdAt": "2026-10-05T11:14:48.635Z"
+    }
+  ],
+  "appreciations": [],
+  "qrTokens": [
+    {
+      "token": "7b037662ae50ea6b8b51f28518890ec0",
+      "eventId": "4a5d8ea8-720f-410c-b1c8-d209569876be",
+      "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "purpose": "checkin",
+      "used": true,
+      "createdAt": "2026-10-05T09:44:16.284Z",
+      "expiresAt": "2026-10-05T21:44:16.284Z"
+    },
+    {
+      "token": "228d0919fdb4070de0701cc809cf7b20",
+      "eventId": "6fe6d2a4-7450-4923-90cf-ba6145b07315",
+      "volunteerId": "f3a65b89-0a93-42ed-a1df-81c2444aa6e4",
+      "purpose": "checkin",
+      "used": true,
+      "createdAt": "2026-10-05T11:13:45.038Z",
+      "expiresAt": "2026-10-05T23:13:45.038Z"
+    }
+  ],
+  "impactShares": [],
+  "microTasks": [],
+  "microTaskSubmissions": [],
+  "impactReports": []
+}
